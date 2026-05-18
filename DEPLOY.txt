@@ -1,0 +1,103 @@
+🚀 BATIK YEDIJAH — DEPLOYMENT QUICK START
+
+═══════════════════════════════════════════════════════════════
+
+STEP 1: LOCAL SETUP (5 minutes)
+───────────────────────────────
+1. cd into the project folder
+2. npm install
+3. cp .env.example .env.local
+4. Edit .env.local:
+   ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxx
+   (Get key from: https://console.anthropic.com/api_keys)
+5. npm run dev
+6. Visit http://localhost:3000
+✓ AI features should work!
+
+═══════════════════════════════════════════════════════════════
+
+STEP 2: PUSH TO GITHUB (3 minutes)
+──────────────────────────────────
+1. Create new repo on GitHub.com
+   - Name: "batik-yedijah"
+   - Don't initialize with README
+2. Copy the git commands GitHub shows
+3. In terminal, run:
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin https://github.com/YOUR-USERNAME/batik-yedijah.git
+   git branch -M main
+   git push -u origin main
+✓ Code is on GitHub
+
+═══════════════════════════════════════════════════════════════
+
+STEP 3: DEPLOY TO VERCEL (2 minutes)
+────────────────────────────────────
+1. Go to vercel.com
+2. Click "New Project"
+3. Click "Import Git Repository"
+4. Select your "batik-yedijah" repo
+5. Click "Import"
+6. Vercel auto-detects Next.js — just click "Deploy"
+   (You don't need to change any settings)
+7. Deployment starts...
+
+═══════════════════════════════════════════════════════════════
+
+STEP 4: ADD API KEY TO VERCEL (1 minute)
+────────────────────────────────────────
+1. While Vercel is deploying, go to your project Settings
+2. Click "Environment Variables"
+3. Add new variable:
+   Key: ANTHROPIC_API_KEY
+   Value: sk-ant-xxxxxxxxxxxx
+4. Click "Save"
+5. Wait for deployment to finish
+✓ Site is live!
+
+═══════════════════════════════════════════════════════════════
+
+THAT'S IT! 
+
+Your site is now live at:
+https://batik-yedijah.vercel.app
+
+(Or whatever your Vercel project name is)
+
+═══════════════════════════════════════════════════════════════
+
+WHAT JUST HAPPENED:
+
+✓ Next.js app running on Vercel servers
+✓ /api/claude endpoint proxies Claude API calls
+✓ Your API key is ONLY on Vercel, NEVER exposed to users
+✓ Every time you push to GitHub, Vercel auto-redeploys
+✓ Website is live 24/7, free tier for hobby projects
+
+═══════════════════════════════════════════════════════════════
+
+NEXT STEPS:
+
+□ Test all pages (Home, Products, AI Stylist, Design, Try-On)
+□ Test AI features (should be fully functional)
+□ Add custom domain (in Vercel Settings > Domains)
+□ Share link on Instagram bio
+□ Monitor API costs (Claude charges ~$0.003 per call)
+
+═══════════════════════════════════════════════════════════════
+
+TROUBLESHOOTING:
+
+If AI features don't work:
+1. Check that API key is in Vercel Environment Variables
+2. Check browser Console (F12) for errors
+3. Verify API key is valid at console.anthropic.com
+
+If site won't deploy:
+1. Make sure .env.local is in .gitignore
+2. Check Vercel Deployment Logs for errors
+3. Verify package.json exists
+
+═══════════════════════════════════════════════════════════════
