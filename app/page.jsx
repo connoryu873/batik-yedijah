@@ -1,708 +1,1016 @@
-'use client';
+'use client'
+import { useState, useRef } from 'react'
 
-import { useState, useRef, useEffect } from "react";
+/* ── Color tokens ─────────────────────────────────────────────── */
+const TC  = '#A0522D'
+const CR  = '#FAF7F2'
+const CRD = '#F0E6D6'
+const BN  = '#6B3A2A'
+const TX  = '#3D2B1F'
+const TXL = '#8B7B70'
+const BD  = '#E2CDB8'
+const WH  = '#FFFFFF'
 
-const C = {
-  bg: "#FDF6EC", surface: "#FFFAF5", surfaceDark: "#F2E8D4",
-  text: "#1C0F07", textSub: "#7A4F35", textMuted: "#B08060",
-  accent: "#B8511F", accentLight: "#E8744A", gold: "#9A7010",
-  border: "#E2C9AC", white: "#FFFFFF",
-  darkBg: "#1C0F07", darkSurface: "#2E1A0E",
-};
-
+/* ── Product catalog ──────────────────────────────────────────── */
 const PRODUCTS = [
-  { id:1, name:"Parang Modern Kemeja", cat:"tops", price:"Rp 165.000", tag:"Office",
-    desc:"Contemporary parang diagonal waves for the modern professional. Slim fit, breathable cotton-blend fabric.",
-    motif:"parang", c1:"#8B1A1A", c2:"#C4A020" },
-  { id:2, name:"Kawung Blouse Premium", cat:"tops", price:"Rp 175.000", tag:"Formal",
-    desc:"Classic sacred circle kawung motif in a modern blouse cut. Perfect for presentations and client meetings.",
-    motif:"kawung", c1:"#3A1A6B", c2:"#B8870B" },
-  { id:3, name:"Mega Mendung Full Set", cat:"sets", price:"Rp 245.000", tag:"Cultural",
-    desc:"Iconic cloud motif from Cirebon in a full coordinated top-and-pants set. Maximum cultural impact.",
-    motif:"megamendung", c1:"#1A3A6B", c2:"#8B4A00" },
-  { id:4, name:"Truntum Office Shirt", cat:"tops", price:"Rp 155.000", tag:"Daily",
-    desc:"Subtle star-flower truntum pattern in muted tones. Non-iron fabric for your busiest workdays.",
-    motif:"truntum", c1:"#1A4A1A", c2:"#6B3A1A" },
-  { id:5, name:"Sidomukti Elegant Set", cat:"sets", price:"Rp 255.000", tag:"Formal",
-    desc:"Royal Javanese court-inspired sidomukti in a contemporary two-piece. A true statement piece.",
-    motif:"sidomukti", c1:"#6B4A00", c2:"#3A1A3A" },
-  { id:6, name:"Lereng Fresh Blouse", cat:"tops", price:"Rp 160.000", tag:"Casual",
-    desc:"Diagonal lereng stripes in modern, fresh colorways. Your everyday go-to that never looks boring.",
-    motif:"lereng", c1:"#1A5C3A", c2:"#3A1A5C" },
-];
+  {
+    id: 1, name: 'Celestial Shirts',
+    img: '/images/YEDIJAH_1.jpg', cat: 'Shirts', price: 'Rp 250.000',
+    occasions: ['Social Media Content', 'Casual Daily Wear'],
+    desc: 'Bold short-sleeve batik shirts with golden jet fighter and lyre motifs on a dreamy watercolor wash. Available in pink and mint.',
+  },
+  {
+    id: 2, name: 'Wrap Panel Tops',
+    img: '/images/YEDIJAH_2.jpg', cat: 'Tops', price: 'Rp 195.000',
+    occasions: ['Office / Work', 'Casual Daily Wear', 'Cultural Ceremony'],
+    desc: 'Diagonal-panel wrap tops combining classic batik motifs with a contemporary, wearable silhouette.',
+  },
+  {
+    id: 3, name: 'Batik Panel Tees',
+    img: '/images/YEDIJAH_3.jpg', cat: 'T-Shirts', price: 'Rp 175.000',
+    occasions: ['Casual Daily Wear', 'Social Media Content'],
+    desc: 'Relaxed tees with bold diagonal batik panels — traditional motifs meets streetwear attitude.',
+  },
+  {
+    id: 4, name: 'Celestial Jackets',
+    img: '/images/YEDIJAH_4.jpg', cat: 'Outerwear', price: 'Rp 395.000',
+    occasions: ['Social Media Content', 'Casual Daily Wear', 'Formal Event'],
+    desc: 'Oversized zip-up jackets with the full celestial print. Statement outerwear for unforgettable moments.',
+  },
+  {
+    id: 5, name: 'Heavenly Realm Shirts',
+    img: '/images/YEDIJAH_6.jpg', cat: 'Shirts', price: 'Rp 225.000',
+    occasions: ['Office / Work', 'Formal Event', 'Cultural Ceremony'],
+    desc: '"Heavenly Realm" panel button-downs in sage, white, lavender and blush. Office-to-event versatility.',
+  },
+  {
+    id: 6, name: 'Heavenly Realm Polos',
+    img: '/images/YEDIJAH_7.jpg', cat: 'Polos', price: 'Rp 185.000',
+    occasions: ['Office / Work', 'Casual Daily Wear'],
+    desc: 'Classic polo shirts with the Heavenly Realm emblem in five refreshing pastel colorways.',
+  },
+  {
+    id: 7, name: 'Rock of Covenant Scarf',
+    img: '/images/YEDIJAH_8.jpg', cat: 'Accessories', price: 'Rp 120.000',
+    occasions: ['Formal Event', 'Cultural Ceremony'],
+    desc: 'Silk-feel scarf with mountain and cherry blossom motifs. A wearable declaration of faith and purpose.',
+  },
+  {
+    id: 8, name: 'Heavenly Realm Scarf',
+    img: '/images/YEDIJAH_9.jpg', cat: 'Accessories', price: 'Rp 120.000',
+    occasions: ['Formal Event', 'Cultural Ceremony'],
+    desc: 'Vibrant winged "Heavenly Realm" scarf with a full rainbow color story.',
+  },
+  {
+    id: 9, name: 'Floral Crop Tops',
+    img: '/images/BATIK_YEDIJAH.jpg', cat: 'Tops', price: 'Rp 165.000',
+    occasions: ['Casual Daily Wear', 'Social Media Content'],
+    desc: 'Puff-sleeve crop tops with lush botanical garden prints in pink, blue and black.',
+  },
+  {
+    id: 10, name: 'On Position Tees',
+    img: '/images/BATIK-YEDIJAH_1.jpg', cat: 'T-Shirts', price: 'Rp 155.000',
+    occasions: ['Casual Daily Wear', 'Social Media Content'],
+    desc: 'Graphic tees with bold "On Position" typography. Available in red and white.',
+  },
+  {
+    id: 11, name: 'Blossom Blouses',
+    img: '/images/BATIK-YEDIJAH_2.jpg', cat: 'Blouses', price: 'Rp 210.000',
+    occasions: ['Casual Daily Wear', 'Formal Event', 'Social Media Content'],
+    desc: 'Flowy V-neck blouses with cherry blossom watercolor prints and elegant flared sleeves.',
+  },
+  {
+    id: 12, name: 'Bright & Bloom Blouses',
+    img: '/images/BATIK-YEDIJAH_3.jpg', cat: 'Blouses', price: 'Rp 230.000',
+    occasions: ['Formal Event', 'Cultural Ceremony', 'Casual Daily Wear'],
+    desc: 'Sunflower print blouses with inspirational text panels and a batik-monogram outer layer.',
+  },
+  {
+    id: 13, name: 'Wrap Collar Blouses',
+    img: '/images/BATIK-YEDIJAH_4.jpg', cat: 'Blouses', price: 'Rp 220.000',
+    occasions: ['Formal Event', 'Office / Work', 'Cultural Ceremony'],
+    desc: 'Elegant peter pan collar blouses with batik inner panel accents and a signature side tie.',
+  },
+]
 
-const MOTIF_KEY = {
-  "Parang (Diagonal Waves)":"parang","Kawung (Sacred Circles)":"kawung",
-  "Mega Mendung (Clouds)":"megamendung","Truntum (Star Flowers)":"truntum",
-  "Sidomukti (Royal Court)":"sidomukti","Lereng (Diagonal Stripes)":"lereng",
-  "Abstract Fusion":"kawung",
-};
-const COLOR_MAP = {
-  "Earth Tones (Brown, Terracotta)":["#8B4513","#D2691E"],
-  "Ocean Blues (Navy, Teal)":["#1A3A6B","#2A8B8B"],
-  "Forest Greens":["#1A5C1A","#3A8B3A"],
-  "Sunset Oranges & Gold":["#C4602A","#B8870B"],
-  "Monochrome (Black & White)":["#1A1A1A","#888888"],
-  "Pastels (Soft & Modern)":["#C4A0B8","#A0C4B8"],
-  "Jewel Tones (Rich & Bold)":["#4A1A6B","#8B1A1A"],
-};
-
-async function callClaude(prompt) {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000,
-      messages:[{role:"user",content:prompt}] }),
-  });
-  const data = await res.json();
-  if (data.error) throw new Error(data.error.message);
-  const text = data.content[0].text;
-  const clean = text.replace(/```json|```/g,"").trim();
-  return JSON.parse(clean);
+/* ── Occasion → recommended product IDs ───────────────────────── */
+const OCC_MAP = {
+  'Social Media Content': [4, 1, 9,  3],
+  'Casual Daily Wear':    [9, 3, 11, 6],
+  'Office / Work':        [5, 13, 6, 2],
+  'Formal Event':         [13, 12, 7, 5],
+  'Cultural Ceremony':    [2, 13, 7, 12],
 }
 
-function BatikSwatch({ motif, c1="#8B4513", c2="#D2691E", size=120 }) {
-  const M = {
-    parang:(
-      <svg viewBox="0 0 100 100" width={size} height={size} style={{display:"block"}}>
-        <rect width="100" height="100" fill={c2+"28"}/>
-        {[0,1,2,3,4].map(i=><path key={i} d={`M${-15+i*26} 108 Q${-5+i*26} 50 ${15+i*26} -8`} stroke={c1} strokeWidth="9" fill="none" opacity="0.65"/>)}
-        {[0,1,2,3,4].map(i=><path key={"b"+i} d={`M${-5+i*26} 108 Q${5+i*26} 50 ${25+i*26} -8`} stroke={c2} strokeWidth="3" fill="none" opacity="0.45"/>)}
-        {[[13,25],[38,25],[63,25],[13,75],[38,75],[63,75]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r="3" fill={c1} opacity="0.5"/>)}
-      </svg>
-    ),
-    kawung:(
-      <svg viewBox="0 0 100 100" width={size} height={size} style={{display:"block"}}>
-        <rect width="100" height="100" fill={c2+"28"}/>
-        {[[25,25],[75,25],[50,50],[25,75],[75,75],[0,50],[100,50],[50,0],[50,100]].slice(0,7).map(([cx,cy],i)=>(
-          <g key={i}>
-            <ellipse cx={cx} cy={cy} rx="18" ry="22" fill="none" stroke={c1} strokeWidth="2.5" opacity="0.75"/>
-            <ellipse cx={cx} cy={cy} rx="10" ry="13" fill="none" stroke={c2} strokeWidth="1.5" opacity="0.55"/>
-            <circle cx={cx} cy={cy} r="3.5" fill={c1} opacity="0.8"/>
-          </g>
-        ))}
-      </svg>
-    ),
-    megamendung:(
-      <svg viewBox="0 0 100 100" width={size} height={size} style={{display:"block"}}>
-        <rect width="100" height="100" fill={c2+"28"}/>
-        <path d="M0 60 Q15 30 35 45 Q45 20 60 38 Q72 15 85 35 Q98 30 100 55 Q100 75 80 72 Q70 90 50 82 Q30 92 15 78 Q-2 72 0 60Z" fill={c1} opacity="0.3"/>
-        <path d="M0 62 Q14 34 33 48 Q43 24 58 40 Q70 18 83 37 Q95 32 97 57 Q96 73 78 70 Q68 87 50 80 Q32 89 17 76 Q1 70 0 62Z" fill="none" stroke={c1} strokeWidth="2" opacity="0.8"/>
-        <path d="M5 65 Q18 42 36 52 Q46 30 60 44 Q71 24 83 40" fill="none" stroke={c2} strokeWidth="1.5" opacity="0.5"/>
-        <circle cx="25" cy="65" r="4" fill={c2} opacity="0.6"/>
-        <circle cx="55" cy="58" r="3" fill={c2} opacity="0.5"/>
-        <circle cx="80" cy="62" r="4" fill={c2} opacity="0.6"/>
-      </svg>
-    ),
-    truntum:(
-      <svg viewBox="0 0 100 100" width={size} height={size} style={{display:"block"}}>
-        <rect width="100" height="100" fill={c2+"28"}/>
-        {[12,37,62,87].map(cx=>[12,37,62,87].map(cy=>(
-          <g key={cx+"-"+cy}>
-            {[0,45,90,135,180,225,270,315].map(deg=>(
-              <line key={deg} x1={cx} y1={cy}
-                x2={cx+9*Math.cos(deg*Math.PI/180)} y2={cy+9*Math.sin(deg*Math.PI/180)}
-                stroke={c1} strokeWidth="1.8" opacity="0.7"/>
-            ))}
-            <circle cx={cx} cy={cy} r="3.5" fill={c2} opacity="0.9"/>
-            <circle cx={cx} cy={cy} r="1.5" fill={c1} opacity="0.9"/>
-          </g>
-        )))}
-      </svg>
-    ),
-    sidomukti:(
-      <svg viewBox="0 0 100 100" width={size} height={size} style={{display:"block"}}>
-        <rect width="100" height="100" fill={c2+"28"}/>
-        <path d="M50 8 L62 34 L90 34 L68 52 L76 78 L50 62 L24 78 L32 52 L10 34 L38 34Z" fill={c1} opacity="0.25"/>
-        <path d="M50 16 L60 36 L80 36 L66 50 L72 70 L50 58 L28 70 L34 50 L20 36 L40 36Z" fill="none" stroke={c1} strokeWidth="2.5" opacity="0.8"/>
-        <path d="M50 26 L57 38 L70 38 L62 46 L65 58 L50 51 L35 58 L38 46 L30 38 L43 38Z" fill="none" stroke={c2} strokeWidth="1.5" opacity="0.6"/>
-        <circle cx="50" cy="50" r="8" fill={c2} opacity="0.5"/>
-        <circle cx="50" cy="50" r="4" fill={c1} opacity="0.85"/>
-      </svg>
-    ),
-    lereng:(
-      <svg viewBox="0 0 100 100" width={size} height={size} style={{display:"block"}}>
-        <rect width="100" height="100" fill={c2+"28"}/>
-        {[0,1,2,3,4,5,6].map(i=>(
-          <line key={i} x1={-25+i*22} y1={110} x2={30+i*22} y2={-10}
-            stroke={i%2===0?c1:c2} strokeWidth={i%2===0?7:3} opacity={i%2===0?0.6:0.35}/>
-        ))}
-        {[11,33,55,77].map(x=>[20,50,80].map(y=>(
-          <circle key={x+"-"+y} cx={x} cy={y} r="3" fill={x%22===11?c1:c2} opacity="0.8"/>
-        )))}
-      </svg>
-    ),
-  };
-  return M[motif] || M.kawung;
+/* ── Shared style helpers ─────────────────────────────────────── */
+const btnSt = (primary = true) => ({
+  background:    primary ? TC : 'transparent',
+  color:         primary ? WH : TC,
+  border:        `2px solid ${TC}`,
+  borderRadius:  '6px',
+  padding:       '10px 24px',
+  cursor:        'pointer',
+  fontFamily:    'Georgia, serif',
+  fontSize:      '14px',
+  fontWeight:    '600',
+  letterSpacing: '0.5px',
+  textDecoration:'none',
+  display:       'inline-block',
+})
+
+const chipSt = (sel = false) => ({
+  background:   sel ? TC : WH,
+  color:        sel ? WH : TX,
+  border:       `1.5px solid ${sel ? TC : BD}`,
+  borderRadius: '20px',
+  padding:      '7px 16px',
+  cursor:       'pointer',
+  fontSize:     '13px',
+  fontFamily:   'Georgia, serif',
+  margin:       '4px',
+  display:      'inline-block',
+})
+
+const cardSt = {
+  background:   WH,
+  borderRadius: '12px',
+  border:       `1px solid ${BD}`,
+  overflow:     'hidden',
+  boxShadow:    '0 2px 8px rgba(0,0,0,0.06)',
 }
 
-function Loader({ text="AI is thinking..." }) {
+/* ══════════════════════════════════════════════════════════════ */
+export default function BatikYedijah() {
+
+  /* ── Navigation ───────────────────────────────────────────── */
+  const [page,      setPage]      = useState('home')
+  const [catFilter, setCatFilter] = useState('All')
+
+  /* ── AI Stylist ───────────────────────────────────────────── */
+  const [sBody,    setSBody]    = useState('')
+  const [sSkin,    setSSkin]    = useState('')
+  const [sOcc,     setSOcc]     = useState('')
+  const [sStyle,   setSStyle]   = useState('')
+  const [sResult,  setSResult]  = useState(null)
+  const [sLoading, setSLoading] = useState(false)
+
+  /* ── Design Studio ────────────────────────────────────────── */
+  const [dMotif,   setDMotif]   = useState('')
+  const [dPalette, setDPalette] = useState('')
+  const [dMood,    setDMood]    = useState('')
+  const [dUse,     setDUse]     = useState('')
+  const [dResult,  setDResult]  = useState(null)
+  const [dLoading, setDLoading] = useState(false)
+
+  /* ── Virtual Try-On ───────────────────────────────────────── */
+  const [tStep,     setTStep]     = useState(1)
+  const [tProd,     setTProd]     = useState(null)
+  const [tPhotoUrl, setTPhotoUrl] = useState(null)
+  const [tPhotoB64, setTPhotoB64] = useState(null)
+  const [tResult,   setTResult]   = useState(null)
+  const [tLoading,  setTLoading]  = useState(false)
+  const fileRef = useRef(null)
+
+  /* ── Helpers ──────────────────────────────────────────────── */
+  const goTo = (p) => {
+    setPage(p)
+    if (typeof window !== 'undefined') window.scrollTo(0, 0)
+  }
+
+  // Resize uploaded image client-side before base64 encoding
+  const resizeImage = (file) =>
+    new Promise((resolve) => {
+      const img = new Image()
+      const url = URL.createObjectURL(file)
+      img.onload = () => {
+        const MAX = 800
+        let w = img.width
+        let h = img.height
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round((h / w) * MAX); w = MAX }
+          else       { w = Math.round((w / h) * MAX); h = MAX }
+        }
+        const c = document.createElement('canvas')
+        c.width = w; c.height = h
+        c.getContext('2d').drawImage(img, 0, 0, w, h)
+        URL.revokeObjectURL(url)
+        resolve(c.toDataURL('image/jpeg', 0.75).split(',')[1])
+      }
+      img.src = url
+    })
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setTPhotoUrl(URL.createObjectURL(file))
+    const b64 = await resizeImage(file)
+    setTPhotoB64(b64)
+  }
+
+  const resetTryon = () => {
+    setTStep(1); setTProd(null)
+    setTPhotoUrl(null); setTPhotoB64(null)
+    setTResult(null); setTLoading(false)
+  }
+
+  /* ── Claude API ───────────────────────────────────────────── */
+  const callClaude = async (prompt, image = null) => {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, image }),
+    })
+    const data = await res.json()
+    if (data.error) throw new Error(data.error)
+    return data.content?.[0]?.text || ''
+  }
+
+  /* ── Stylist submit ───────────────────────────────────────── */
+  const handleStylistSubmit = async () => {
+    if (!sBody || !sSkin || !sOcc) return
+    setSLoading(true); setSResult(null)
+    const prompt = `You are the AI Personal Stylist for Batik Yedijah, a modern Indonesian batik brand in Bekasi.
+
+Customer profile:
+- Body type: ${sBody}
+- Skin tone: ${sSkin}
+- Occasion: ${sOcc}
+- Style preference: ${sStyle || 'Open to suggestions'}
+
+Our collection: Celestial Shirts (jet fighter & lyre print), Wrap Panel Tops, Batik Panel Tees, Celestial Jackets (oversized), Heavenly Realm Shirts, Heavenly Realm Polos, Rock of Covenant Scarf, Heavenly Realm Scarf, Floral Crop Tops, On Position Tees, Blossom Blouses (cherry blossom), Bright & Bloom Blouses (sunflower), Wrap Collar Blouses.
+
+Return ONLY valid JSON, no preamble or markdown:
+{
+  "tagline": "One punchy fun personalized sentence like an Instagram caption",
+  "styleRec": "2-3 sentences on silhouettes, cuts, and drapes that flatter this customer",
+  "colorPalette": "Which batik colors and patterns complement their skin tone",
+  "topPicks": [
+    { "name": "product name from our collection", "why": "specific reason for this customer" },
+    { "name": "product name from our collection", "why": "specific reason for this customer" },
+    { "name": "product name from our collection", "why": "specific reason for this customer" }
+  ],
+  "stylingTip": "One actionable tip for wearing batik to this specific occasion"
+}`
+    try {
+      const raw = await callClaude(prompt)
+      setSResult(JSON.parse(raw.replace(/```json|```/g, '').trim()))
+    } catch { setSResult({ error: true }) }
+    setSLoading(false)
+  }
+
+  /* ── Design submit ────────────────────────────────────────── */
+  const handleDesignSubmit = async () => {
+    if (!dMotif || !dPalette) return
+    setDLoading(true); setDResult(null)
+    const prompt = `You are the AI Design Consultant for Batik Yedijah, a modern Indonesian batik brand.
+
+Design brief:
+- Motif theme: ${dMotif}
+- Color palette: ${dPalette}
+- Mood: ${dMood || 'Not specified'}
+- Intended use: ${dUse || 'Not specified'}
+
+Return ONLY valid JSON, no preamble:
+{
+  "name": "Poetic design name",
+  "concept": "2-3 sentence concept",
+  "pattern": "Detailed visual description of the batik pattern and arrangement",
+  "colorStory": "How the colors interact and the effect they create",
+  "symbolism": "Cultural and spiritual meaning of the motifs",
+  "garment": "Best garment type to showcase this design",
+  "production": "Recommended technique: cap batik, tulis, or digital print — and why"
+}`
+    try {
+      const raw = await callClaude(prompt)
+      setDResult(JSON.parse(raw.replace(/```json|```/g, '').trim()))
+    } catch { setDResult({ error: true }) }
+    setDLoading(false)
+  }
+
+  /* ── Try-on submit ────────────────────────────────────────── */
+  const handleTryOn = async () => {
+    if (!tProd) return
+    setTLoading(true); setTResult(null)
+    const prod = PRODUCTS.find(p => p.id === tProd)
+
+    const prompt = tPhotoB64
+      ? `You are a personal fashion stylist for Batik Yedijah, an Indonesian batik brand.
+The customer uploaded their photo and wants to try on: "${prod.name}"
+Description: ${prod.desc}
+Category: ${prod.cat} | Price: ${prod.price}
+
+Based on the customer's photo, give a warm personalized try-on:
+
+FIRST IMPRESSION
+A kind, specific 1-2 sentence greeting based on what you see in their photo.
+
+HOW IT LOOKS ON YOU
+How this specific piece works on their frame and coloring — 3-4 detailed, specific sentences.
+
+STYLE IT WITH
+Three specific items to pair for a complete look.
+
+FIT NOTE
+Any sizing or fit guidance relevant to their build.
+
+THE VERDICT
+An enthusiastic one-liner on why this piece is right for them.`
+      : `You are a personal fashion stylist for Batik Yedijah, an Indonesian batik brand.
+A customer wants to know about: "${prod.name}"
+Description: ${prod.desc}
+Category: ${prod.cat} | Price: ${prod.price}
+
+WHO IT IS FOR
+Which body types and style personalities this suits best — 3 sentences.
+
+3 WAYS TO WEAR IT
+Three complete outfit ideas with specific pairings.
+
+OCCASION GUIDE
+Which settings and events this piece works for.
+
+CARE TIPS
+How to look after this batik piece.
+
+WHY WE LOVE IT
+What makes this piece unique in the Batik Yedijah collection.`
+
+    try {
+      const text = await callClaude(prompt, tPhotoB64 || null)
+      setTResult(text)
+    } catch {
+      setTResult('Something went wrong. Please try again.')
+    }
+    setTLoading(false)
+    setTStep(3)
+  }
+
+  /* ── Computed values ──────────────────────────────────────── */
+  const CATS = ['All', 'Shirts', 'Tops', 'T-Shirts', 'Outerwear', 'Polos', 'Blouses', 'Accessories']
+  const filteredProds = catFilter === 'All' ? PRODUCTS : PRODUCTS.filter(p => p.cat === catFilter)
+  const recProds = sOcc && OCC_MAP[sOcc]
+    ? OCC_MAP[sOcc].map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean)
+    : []
+  const selectedProd = PRODUCTS.find(p => p.id === tProd)
+
+  const NAV = [
+    ['home', 'Home'], ['collection', 'Collection'], ['stylist', 'AI Stylist'],
+    ['studio', 'Design Studio'], ['tryon', 'Virtual Try-On'], ['story', 'Our Story'],
+  ]
+
+  /* ── RENDER ───────────────────────────────────────────────── */
   return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"12px",padding:"48px 24px"}}>
-      <div style={{width:"36px",height:"36px",border:`3px solid ${C.border}`,borderTopColor:C.accent,borderRadius:"50%",animation:"spin 0.9s linear infinite"}}/>
-      <p style={{color:C.textSub,fontSize:"14px",margin:0,fontStyle:"italic"}}>{text}</p>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    </div>
-  );
-}
+    <div style={{ minHeight: '100vh', background: CR, fontFamily: 'Georgia, serif', color: TX }}>
 
-function Btn({ children, onClick, variant="primary", sx={}, disabled=false }) {
-  const base = {padding:"10px 24px",borderRadius:"5px",fontFamily:"'Georgia','Times New Roman',serif",fontSize:"14px",cursor:disabled?"not-allowed":"pointer",transition:"all 0.2s",fontWeight:"600",letterSpacing:"0.04em",opacity:disabled?0.55:1,...sx};
-  const v = {
-    primary:{background:C.accent,color:C.white,border:`1.5px solid ${C.accent}`},
-    outline:{background:"transparent",color:C.accent,border:`1.5px solid ${C.accent}`},
-    ghost:{background:"transparent",color:C.white,border:`1.5px solid rgba(255,255,255,0.4)`},
-    gold:{background:C.gold,color:C.white,border:`1.5px solid ${C.gold}`},
-  };
-  return <button style={{...base,...v[variant]}} onClick={onClick} disabled={disabled}>{children}</button>;
-}
-
-function Badge({ children, color=C.accent }) {
-  return <span style={{background:color+"22",color,fontSize:"10px",padding:"3px 9px",borderRadius:"20px",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",display:"inline-block"}}>{children}</span>;
-}
-
-function Tag({ children }) {
-  return <span style={{background:C.surfaceDark,color:C.textSub,fontSize:"10px",padding:"2px 8px",borderRadius:"3px",fontWeight:"600",letterSpacing:"0.08em",textTransform:"uppercase"}}>{children}</span>;
-}
-
-function Section({ children, bg=C.bg, sx={} }) {
-  return (
-    <section style={{background:bg,padding:"80px 24px",...sx}}>
-      <div style={{maxWidth:"1120px",margin:"0 auto"}}>{children}</div>
-    </section>
-  );
-}
-
-function SectionHead({ title, sub, light=false }) {
-  return (
-    <div style={{marginBottom:"52px",textAlign:"center"}}>
-      <h2 style={{fontSize:"clamp(30px,4vw,44px)",color:light?"#FDF6EC":C.text,margin:"0 0 14px",fontStyle:"italic",fontWeight:"300",lineHeight:"1.2"}}>{title}</h2>
-      {sub && <p style={{color:light?"#D4B896":C.textSub,fontSize:"16px",maxWidth:"520px",margin:"0 auto",lineHeight:"1.8",fontWeight:"300"}}>{sub}</p>}
-    </div>
-  );
-}
-
-function SelectGroup({ label, field, opts, form, setForm }) {
-  return (
-    <div style={{marginBottom:"22px"}}>
-      <label style={{display:"block",color:C.text,fontSize:"11px",fontWeight:"700",marginBottom:"10px",letterSpacing:"0.1em",textTransform:"uppercase"}}>{label}</label>
-      <div style={{display:"flex",flexWrap:"wrap",gap:"8px"}}>
-        {opts.map(o=>(
-          <button key={o} onClick={()=>setForm(f=>({...f,[field]:o}))}
-            style={{padding:"7px 15px",borderRadius:"4px",fontFamily:"inherit",fontSize:"12px",cursor:"pointer",transition:"all 0.18s",
-              background:form[field]===o?C.accent:"transparent",
-              color:form[field]===o?C.white:C.textSub,
-              border:`1px solid ${form[field]===o?C.accent:C.border}`,
-              fontWeight:form[field]===o?"600":"400"}}>
-            {o}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ErrorBox({ msg }) {
-  return <div style={{background:"#FEF2F2",border:"1px solid #FECACA",borderRadius:"10px",padding:"16px 20px",color:"#991B1B",fontSize:"13px",lineHeight:"1.6"}}>{msg}</div>;
-}
-
-function NavBar({ page, setPage }) {
-  const links=[
-    {id:"home",label:"Home"},{id:"products",label:"Collection"},
-    {id:"stylist",label:"AI Stylist"},{id:"design",label:"Design Studio"},
-    {id:"tryon",label:"Virtual Try-On"},{id:"about",label:"Our Story"},
-  ];
-  return (
-    <nav style={{background:C.white,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,zIndex:200,boxShadow:"0 1px 8px rgba(28,15,7,0.06)"}}>
-      <div style={{maxWidth:"1200px",margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",height:"60px"}}>
-        <button style={{background:"none",border:"none",cursor:"pointer",padding:0,fontFamily:"inherit"}} onClick={()=>setPage("home")}>
-          <span style={{fontSize:"20px",fontWeight:"700",color:C.accent,fontStyle:"italic",letterSpacing:"-0.02em"}}>Batik</span>
-          <span style={{fontSize:"20px",fontWeight:"300",color:C.text,letterSpacing:"0.06em"}}> Yedijah</span>
+      {/* ── Navigation ──────────────────────────────────────── */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+        background: 'rgba(250,247,242,0.97)', backdropFilter: 'blur(8px)',
+        borderBottom: `1px solid ${BD}`, padding: '0 32px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px',
+      }}>
+        <button onClick={() => goTo('home')} style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          fontFamily: 'Georgia, serif', fontSize: '20px', fontWeight: '700', padding: 0,
+        }}>
+          <span style={{ color: TC }}>Batik</span>
+          <span style={{ color: TX }}> Yedijah</span>
         </button>
-        <div style={{display:"flex",gap:"4px",alignItems:"center"}}>
-          {links.map(l=>(
-            <button key={l.id} onClick={()=>setPage(l.id)}
-              style={{background:page===l.id?C.accent:"transparent",color:page===l.id?C.white:C.textSub,
-                border:"none",padding:"6px 13px",borderRadius:"4px",cursor:"pointer",fontSize:"12px",
-                fontFamily:"inherit",fontWeight:page===l.id?"600":"400",transition:"all 0.18s",letterSpacing:"0.02em"}}>
-              {l.label}
-            </button>
+        <div style={{ display: 'flex', gap: '2px', flexWrap: 'wrap' }}>
+          {NAV.map(([id, label]) => (
+            <button key={id} onClick={() => goTo(id)} style={{
+              background:   page === id ? TC : 'none',
+              color:        page === id ? WH : TX,
+              border:       'none',
+              padding:      page === id ? '6px 14px' : '6px 10px',
+              borderRadius: '6px',
+              cursor:       'pointer',
+              fontSize:     '13px',
+              fontFamily:   'Georgia, serif',
+              fontWeight:   page === id ? '600' : '400',
+            }}>{label}</button>
           ))}
         </div>
-      </div>
-    </nav>
-  );
-}
+      </nav>
 
-function HomePage({ setPage }) {
-  return (
-    <div>
-      <div style={{background:"linear-gradient(135deg,#2C1A0E 0%,#5C2D0A 55%,#7A3A12 100%)",padding:"110px 24px 100px",position:"relative",overflow:"hidden"}}>
-        <div style={{position:"absolute",inset:0,opacity:0.07}}>
-          <svg width="100%" height="100%">
-            <defs>
-              <pattern id="hp" x="0" y="0" width="70" height="70" patternUnits="userSpaceOnUse">
-                <circle cx="35" cy="35" r="28" fill="none" stroke="#FDF6EC" strokeWidth="1.5"/>
-                <circle cx="35" cy="35" r="16" fill="none" stroke="#FDF6EC" strokeWidth="1"/>
-                <circle cx="35" cy="35" r="5" fill="#FDF6EC"/>
-                <circle cx="0" cy="0" r="3" fill="#FDF6EC"/>
-                <circle cx="70" cy="0" r="3" fill="#FDF6EC"/>
-                <circle cx="0" cy="70" r="3" fill="#FDF6EC"/>
-                <circle cx="70" cy="70" r="3" fill="#FDF6EC"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#hp)"/>
-          </svg>
-        </div>
-        <div style={{maxWidth:"860px",margin:"0 auto",textAlign:"center",position:"relative"}}>
-          <div style={{marginBottom:"20px"}}><Badge color="#B8870B">Modern Batik · Bekasi, Indonesia · Est. 2010</Badge></div>
-          <h1 style={{color:"#FDF6EC",fontSize:"clamp(38px,6vw,72px)",margin:"0 0 22px",fontWeight:"300",lineHeight:"1.12",fontStyle:"italic"}}>
-            Wear Your Heritage.<br/>
-            <span style={{fontWeight:"700",fontStyle:"normal",color:"#E8A060"}}>Own Your Style.</span>
-          </h1>
-          <p style={{color:"#C8A480",fontSize:"18px",maxWidth:"540px",margin:"0 auto 44px",lineHeight:"1.9",fontWeight:"300"}}>
-            Modern batik for young professionals — powered by AI styling that makes Indonesian heritage feel effortless, confident, and yours.
-          </p>
-          <div style={{display:"flex",gap:"16px",justifyContent:"center",flexWrap:"wrap"}}>
-            <Btn onClick={()=>setPage("products")} sx={{padding:"14px 34px",fontSize:"15px"}}>Shop Collection</Btn>
-            <Btn onClick={()=>setPage("stylist")} variant="ghost" sx={{padding:"14px 34px",fontSize:"15px"}}>Try AI Stylist ✦</Btn>
-          </div>
-        </div>
-      </div>
+      <div style={{ paddingTop: '64px' }}>
 
-      <Section bg={C.bg}>
-        <SectionHead title="Batik Reimagined for Today" sub="15 years of family craftsmanship meets AI-powered tools no competitor offers."/>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:"20px"}}>
-          {[
-            {icon:"🪡",title:"Modern Design",desc:"Printed batik that's office-appropriate, fashionable, and genuinely wearable — not just for ceremonies."},
-            {icon:"✨",title:"AI Personal Stylist",desc:"Body type, skin tone, occasion — our AI recommends the exact batik that works for you."},
-            {icon:"🎨",title:"AI Design Studio",desc:"Generate unique batik concepts combining traditional motifs with contemporary aesthetics."},
-            {icon:"📸",title:"Virtual Try-On",desc:"Upload your photo and see how garments look on you before committing to buy."},
-          ].map(f=>(
-            <div key={f.title} style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:"14px",padding:"28px 24px"}}>
-              <div style={{fontSize:"30px",marginBottom:"14px"}}>{f.icon}</div>
-              <h3 style={{color:C.text,margin:"0 0 10px",fontSize:"17px",fontWeight:"600"}}>{f.title}</h3>
-              <p style={{color:C.textSub,fontSize:"13px",lineHeight:"1.75",margin:0}}>{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      <Section bg={C.surfaceDark}>
-        <SectionHead title="Quality You Can Actually Afford" sub="We sit in the gap that no other brand owns."/>
-        <div style={{display:"flex",gap:"16px",justifyContent:"center",flexWrap:"wrap",maxWidth:"720px",margin:"0 auto",textAlign:"center"}}>
-          {[
-            {label:"Premium Handmade",range:"Rp 500K – 5M+",note:"Out of reach for daily wear",hi:false},
-            {label:"✦ Batik Yedijah",range:"Rp 130K – 260K",note:"High quality · Modern · AI-powered",hi:true},
-            {label:"Generic Shopee",range:"Rp 50K – 150K",note:"Inconsistent quality & sizing",hi:false},
-          ].map(p=>(
-            <div key={p.label} style={{flex:"1 1 180px",background:p.hi?C.accent:C.white,border:`2px solid ${p.hi?C.accent:C.border}`,borderRadius:"14px",padding:"26px 18px",transform:p.hi?"scale(1.04)":"none"}}>
-              <p style={{color:p.hi?"rgba(255,255,255,0.75)":C.textMuted,fontSize:"11px",margin:"0 0 8px",fontWeight:"700",textTransform:"uppercase",letterSpacing:"0.1em"}}>{p.label}</p>
-              <p style={{color:p.hi?C.white:C.text,fontSize:"19px",fontWeight:"700",margin:"0 0 6px"}}>{p.range}</p>
-              <p style={{color:p.hi?"rgba(255,255,255,0.7)":C.textSub,fontSize:"11px",margin:0,lineHeight:"1.5"}}>{p.note}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      <Section bg={C.darkBg} sx={{textAlign:"center"}}>
-        <SectionHead light title="Ready to Find Your Style?" sub="Let our AI stylist build the perfect batik look for your body type, skin tone, and occasion."/>
-        <Btn onClick={()=>setPage("stylist")} sx={{padding:"16px 44px",fontSize:"15px"}}>Start AI Styling →</Btn>
-      </Section>
-    </div>
-  );
-}
-
-function ProductsPage() {
-  const [filter,setFilter]=useState("all");
-  const shown=filter==="all"?PRODUCTS:PRODUCTS.filter(p=>p.cat===filter);
-  return (
-    <Section>
-      <SectionHead title="Our Collection" sub="Modern printed batik — wearable, consistent quality, priced for real life."/>
-      <div style={{display:"flex",gap:"10px",justifyContent:"center",marginBottom:"44px",flexWrap:"wrap"}}>
-        {[["all","All Items"],["tops","Tops & Shirts"],["sets","Full Sets"]].map(([v,l])=>(
-          <button key={v} onClick={()=>setFilter(v)}
-            style={{background:filter===v?C.accent:"transparent",color:filter===v?C.white:C.textSub,
-              border:`1px solid ${filter===v?C.accent:C.border}`,padding:"8px 22px",borderRadius:"20px",
-              cursor:"pointer",fontFamily:"inherit",fontSize:"12px",fontWeight:"600",transition:"all 0.18s",letterSpacing:"0.05em"}}>
-            {l}
-          </button>
-        ))}
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:"24px"}}>
-        {shown.map(p=>(
-          <div key={p.id} style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:"16px",overflow:"hidden",transition:"transform 0.2s"}}>
-            <div style={{background:C.surfaceDark,height:"220px",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
-              <BatikSwatch motif={p.motif} c1={p.c1} c2={p.c2} size={186}/>
-              <div style={{position:"absolute",top:"14px",right:"14px"}}><Tag>{p.tag}</Tag></div>
-            </div>
-            <div style={{padding:"20px 22px"}}>
-              <h3 style={{color:C.text,margin:"0 0 8px",fontSize:"16px",fontWeight:"600",lineHeight:"1.3"}}>{p.name}</h3>
-              <p style={{color:C.textSub,fontSize:"12px",lineHeight:"1.7",margin:"0 0 18px"}}>{p.desc}</p>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                <span style={{color:C.accent,fontSize:"17px",fontWeight:"700"}}>{p.price}</span>
-                <Btn sx={{padding:"7px 16px",fontSize:"11px"}}>Add to Bag</Btn>
+        {/* ════ HOME ════════════════════════════════════════════ */}
+        {page === 'home' && (
+          <div>
+            {/* Hero */}
+            <div style={{
+              background: `linear-gradient(135deg, ${CRD} 0%, ${CR} 55%, #EEE0D2 100%)`,
+              padding: '80px 32px', textAlign: 'center',
+            }}>
+              <p style={{ color: TC, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '14px' }}>
+                Heritage Reimagined
+              </p>
+              <h1 style={{ fontSize: 'clamp(28px, 5vw, 58px)', fontWeight: '300', lineHeight: '1.2', color: BN, marginBottom: '20px' }}>
+                Batik with Soul,<br />
+                <span style={{ color: TC, fontStyle: 'italic' }}>Style with Purpose</span>
+              </h1>
+              <p style={{ fontSize: '15px', color: TXL, maxWidth: '500px', margin: '0 auto 36px', lineHeight: '1.8' }}>
+                Every thread tells a story. Batik Yedijah brings Indonesia's living art form into your everyday wardrobe —
+                infused with faith, crafted with love.
+              </p>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button onClick={() => goTo('collection')} style={btnSt(true)}>Explore Collection</button>
+                <button onClick={() => goTo('stylist')} style={btnSt(false)}>AI Personal Stylist</button>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-      <div style={{marginTop:"48px",background:`${C.gold}14`,border:`1px solid ${C.gold}44`,borderRadius:"12px",padding:"28px 32px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"16px"}}>
-        <div>
-          <p style={{color:C.text,fontWeight:"600",margin:"0 0 4px",fontSize:"15px"}}>B2B School & Office Uniforms</p>
-          <p style={{color:C.textSub,margin:0,fontSize:"13px"}}>Custom bulk orders from 50 units · Dedicated WhatsApp account manager · 3–4 week lead time</p>
-        </div>
-        <Btn variant="outline" sx={{padding:"9px 22px",fontSize:"12px"}}>Enquire Now →</Btn>
-      </div>
-    </Section>
-  );
-}
 
-function StylistPage() {
-  const [form,setForm]=useState({bodyType:"",skinTone:"",occasion:"",style:""});
-  const [loading,setLoading]=useState(false);
-  const [result,setResult]=useState(null);
-  const [error,setError]=useState(null);
-  const opts={
-    bodyType:["Slim / Petite","Athletic / Fit","Curvy / Hourglass","Plus Size / Full Figure","Tall / Lean"],
-    skinTone:["Very Fair","Fair / Light","Medium / Olive","Tan / Brown","Deep / Dark"],
-    occasion:["Office / Work","Formal Event","Cultural Ceremony","Casual Daily Wear","Social Media Content"],
-    style:["Modern & Minimalist","Bold & Statement","Classic & Elegant","Trendy Fusion","Traditional Inspired"],
-  };
-  const ready=Object.values(form).every(v=>v);
-
-  const handleSubmit=async()=>{
-    if(!ready)return;
-    setLoading(true); setError(null); setResult(null);
-    try {
-      const r=await callClaude(`You are the AI stylist for Batik Yedijah, a modern Indonesian batik brand targeting young professionals 22-35. Our products are printed modern batik tops (Rp 130K-180K) and full sets (Rp 220K-260K) in motifs: Parang, Kawung, Mega Mendung, Truntum, Sidomukti, Lereng.
-
-Customer: body type: ${form.bodyType}, skin tone: ${form.skinTone}, occasion: ${form.occasion}, style: ${form.style}
-
-Return ONLY a JSON object (no markdown, no preamble):
-{"greeting":"warm personalized 1-sentence opening","recommendation":"2-3 sentences on what cut/style works best","top_picks":[{"name":"product name from our range","reason":"why it suits them specifically"}],"top_picks contains exactly 3 items","colors":["color palette name 1","color palette name 2","color palette name 3"],"styling_tip":"1 specific actionable tip for their occasion","confidence_boost":"1 empowering closing sentence"}`);
-      setResult(r);
-    } catch(e) { setError("Couldn't connect to the AI. Please try again."); }
-    setLoading(false);
-  };
-
-  return (
-    <Section>
-      <SectionHead title="AI Personal Stylist" sub="Share your profile and get AI-powered batik recommendations tailored to your body, skin tone, and occasion."/>
-      <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) minmax(0,1fr)",gap:"40px",alignItems:"start"}}>
-        <div style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:"16px",padding:"32px"}}>
-          <p style={{color:C.textMuted,fontSize:"12px",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",margin:"0 0 24px"}}>Your Profile</p>
-          <SelectGroup label="Body Type" field="bodyType" opts={opts.bodyType} form={form} setForm={setForm}/>
-          <SelectGroup label="Skin Tone" field="skinTone" opts={opts.skinTone} form={form} setForm={setForm}/>
-          <SelectGroup label="Occasion" field="occasion" opts={opts.occasion} form={form} setForm={setForm}/>
-          <SelectGroup label="Style Preference" field="style" opts={opts.style} form={form} setForm={setForm}/>
-          <Btn onClick={handleSubmit} disabled={!ready||loading} sx={{width:"100%",padding:"14px",fontSize:"14px",marginTop:"8px",boxSizing:"border-box"}}>
-            {loading?"Finding Your Style…":"Get My Recommendations ✦"}
-          </Btn>
-          {!ready && <p style={{color:C.textMuted,fontSize:"11px",textAlign:"center",margin:"10px 0 0",fontStyle:"italic"}}>Select all options above to get your recommendations</p>}
-        </div>
-        <div>
-          {loading && <Loader text="Crafting your personal style…"/>}
-          {error && <ErrorBox msg={error}/>}
-          {result && (
-            <div style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:"16px",padding:"32px"}}>
-              <div style={{background:`${C.accent}0E`,borderLeft:`3px solid ${C.accent}`,padding:"16px 20px",borderRadius:"0 8px 8px 0",marginBottom:"24px"}}>
-                <p style={{color:C.text,margin:0,lineHeight:"1.8",fontStyle:"italic",fontSize:"15px"}}>{result.greeting}</p>
+            {/* Featured pieces */}
+            <div style={{ padding: '64px 32px', maxWidth: '1200px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                <p style={{ color: TC, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '8px' }}>Curated Picks</p>
+                <h2 style={{ fontSize: '30px', fontWeight: '300', color: BN, margin: 0 }}>Featured Pieces</h2>
               </div>
-              <h4 style={{color:C.text,margin:"0 0 10px",fontSize:"14px",fontWeight:"700",textTransform:"uppercase",letterSpacing:"0.08em"}}>Style Recommendation</h4>
-              <p style={{color:C.textSub,lineHeight:"1.85",margin:"0 0 24px",fontSize:"14px"}}>{result.recommendation}</p>
-              <h4 style={{color:C.text,margin:"0 0 12px",fontSize:"14px",fontWeight:"700",textTransform:"uppercase",letterSpacing:"0.08em"}}>Top Picks For You</h4>
-              {(result.top_picks||[]).map((p,i)=>(
-                <div key={i} style={{display:"flex",gap:"12px",marginBottom:"10px",padding:"12px 14px",background:C.bg,borderRadius:"8px",border:`1px solid ${C.border}`}}>
-                  <span style={{color:C.gold,fontSize:"16px",fontWeight:"700",minWidth:"22px"}}>{i+1}.</span>
-                  <div>
-                    <p style={{color:C.text,margin:"0 0 3px",fontWeight:"600",fontSize:"13px"}}>{p.name}</p>
-                    <p style={{color:C.textSub,margin:0,fontSize:"12px",lineHeight:"1.6"}}>{p.reason}</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '24px' }}>
+                {[4, 1, 11, 9, 5, 13].map(id => {
+                  const p = PRODUCTS.find(pr => pr.id === id)
+                  if (!p) return null
+                  return (
+                    <div key={p.id} onClick={() => goTo('collection')} style={{ ...cardSt, cursor: 'pointer' }}>
+                      <div style={{ height: '280px', overflow: 'hidden', background: CRD }}>
+                        <img src={p.img} alt={p.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s' }}
+                          onMouseOver={e => { e.currentTarget.style.transform = 'scale(1.05)' }}
+                          onMouseOut={e => { e.currentTarget.style.transform = 'scale(1)' }}
+                        />
+                      </div>
+                      <div style={{ padding: '16px' }}>
+                        <p style={{ fontSize: '10px', color: TC, textTransform: 'uppercase', letterSpacing: '1.5px', margin: '0 0 4px' }}>{p.cat}</p>
+                        <h3 style={{ fontSize: '15px', fontWeight: '600', margin: '0 0 4px', color: TX }}>{p.name}</h3>
+                        <p style={{ fontSize: '14px', color: TC, fontWeight: '700', margin: 0 }}>{p.price}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '40px' }}>
+                <button onClick={() => goTo('collection')} style={btnSt(false)}>View Full Collection →</button>
+              </div>
+            </div>
+
+            {/* AI features banner */}
+            <div style={{ background: BN, padding: '64px 32px', textAlign: 'center' }}>
+              <p style={{ color: `${CRD}70`, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '8px' }}>Powered by AI</p>
+              <h2 style={{ fontSize: '28px', fontWeight: '300', color: WH, marginBottom: '12px' }}>Your Batik Journey, Personalized</h2>
+              <p style={{ color: `${WH}80`, maxWidth: '460px', margin: '0 auto 40px', lineHeight: '1.8', fontSize: '14px' }}>
+                From styling recommendations to custom design concepts — our AI tools make batik fashion accessible and deeply personal.
+              </p>
+              <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                {[
+                  { label: 'AI Personal Stylist', p: 'stylist', sub: 'Personalized outfit recommendations' },
+                  { label: 'AI Design Studio',    p: 'studio',  sub: 'Co-create a custom batik design' },
+                  { label: 'Virtual Try-On',       p: 'tryon',   sub: 'See how pieces look on you' },
+                ].map(f => (
+                  <div key={f.p} onClick={() => goTo(f.p)} style={{
+                    background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: '12px', padding: '24px 28px', cursor: 'pointer', width: '210px',
+                  }}
+                    onMouseOver={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.16)' }}
+                    onMouseOut={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)' }}
+                  >
+                    <p style={{ fontSize: '15px', fontWeight: '600', color: WH, margin: '0 0 8px' }}>{f.label}</p>
+                    <p style={{ fontSize: '12px', color: `${WH}70`, margin: 0 }}>{f.sub}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Brand values */}
+            <div style={{ padding: '64px 32px', maxWidth: '960px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                <p style={{ color: TC, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '8px' }}>Our Promise</p>
+                <h2 style={{ fontSize: '28px', fontWeight: '300', color: BN, margin: 0 }}>Why Batik Yedijah</h2>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
+                {[
+                  { t: 'Heritage Craft',     b: 'Rooted in Javanese batik traditions passed through generations of family craftsmanship.' },
+                  { t: 'Modern Silhouettes', b: 'Designed for young professionals who wear culture with confidence and intention.' },
+                  { t: 'Made in Indonesia',  b: 'Proudly produced in Bekasi, supporting local artisans and the textile community.' },
+                  { t: 'AI-Powered Style',   b: 'Cutting-edge tools to make your batik experience uniquely personal and accessible.' },
+                ].map(v => (
+                  <div key={v.t} style={{ padding: '24px', background: WH, borderRadius: '12px', border: `1px solid ${BD}`, textAlign: 'center' }}>
+                    <div style={{ width: '36px', height: '3px', background: TC, margin: '0 auto 16px' }} />
+                    <h3 style={{ fontSize: '15px', fontWeight: '600', color: BN, marginBottom: '10px' }}>{v.t}</h3>
+                    <p style={{ fontSize: '13px', color: TXL, lineHeight: '1.6', margin: 0 }}>{v.b}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{ borderTop: `1px solid ${BD}`, padding: '32px', textAlign: 'center', background: `${BN}0D` }}>
+              <p style={{ margin: '0 0 6px' }}>
+                <span style={{ color: TC, fontWeight: '700' }}>Batik</span>
+                <span style={{ color: TX }}> Yedijah</span>
+              </p>
+              <p style={{ fontSize: '13px', color: TXL, margin: '0 0 2px' }}>Bekasi, West Java, Indonesia</p>
+              <p style={{ fontSize: '12px', color: TXL, margin: 0 }}>© 2026 Batik Yedijah. All rights reserved.</p>
+            </div>
+          </div>
+        )}
+
+        {/* ════ COLLECTION ══════════════════════════════════════ */}
+        {page === 'collection' && (
+          <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 32px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+              <p style={{ color: TC, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '8px' }}>Batik Yedijah</p>
+              <h1 style={{ fontSize: '34px', fontWeight: '300', color: BN, margin: '0 0 12px' }}>Our Collection</h1>
+              <p style={{ color: TXL, fontSize: '14px', maxWidth: '460px', margin: '0 auto' }}>
+                Curated pieces honoring Indonesia's batik heritage while embracing modern style.
+              </p>
+            </div>
+
+            {/* Category filter */}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '40px' }}>
+              {CATS.map(c => (
+                <button key={c} onClick={() => setCatFilter(c)} style={chipSt(catFilter === c)}>{c}</button>
+              ))}
+            </div>
+
+            {/* Product grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '24px' }}>
+              {filteredProds.map(p => (
+                <div key={p.id} style={cardSt}>
+                  <div style={{ height: '300px', overflow: 'hidden', background: CRD, position: 'relative' }}>
+                    <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <button onClick={() => { setTProd(p.id); setTStep(1); goTo('tryon') }} style={{
+                      position: 'absolute', bottom: '12px', right: '12px',
+                      background: 'rgba(160,82,45,0.92)', color: WH, border: 'none',
+                      borderRadius: '6px', padding: '7px 14px', cursor: 'pointer',
+                      fontSize: '11px', fontFamily: 'Georgia, serif', fontWeight: '600',
+                    }}>Try On</button>
+                  </div>
+                  <div style={{ padding: '16px' }}>
+                    <p style={{ fontSize: '10px', color: TC, textTransform: 'uppercase', letterSpacing: '1.5px', margin: '0 0 4px' }}>{p.cat}</p>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', margin: '0 0 8px', color: TX }}>{p.name}</h3>
+                    <p style={{ fontSize: '12px', color: TXL, lineHeight: '1.55', marginBottom: '14px' }}>{p.desc}</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: TC, fontWeight: '700', fontSize: '15px' }}>{p.price}</span>
+                      <a href="https://wa.me/6287711553205" target="_blank" rel="noopener noreferrer"
+                        style={{ ...btnSt(true), padding: '6px 14px', fontSize: '12px' }}>
+                        Order via WA
+                      </a>
+                    </div>
                   </div>
                 </div>
               ))}
-              <h4 style={{color:C.text,margin:"20px 0 10px",fontSize:"14px",fontWeight:"700",textTransform:"uppercase",letterSpacing:"0.08em"}}>Best Colors For Your Skin Tone</h4>
-              <div style={{display:"flex",gap:"8px",flexWrap:"wrap",marginBottom:"20px"}}>
-                {(result.colors||[]).map(col=><Badge key={col} color={C.gold}>{col}</Badge>)}
-              </div>
-              <div style={{background:`${C.gold}14`,border:`1px solid ${C.gold}44`,borderRadius:"8px",padding:"16px 18px",marginBottom:"16px"}}>
-                <p style={{color:C.text,margin:"0 0 6px",fontWeight:"600",fontSize:"12px",textTransform:"uppercase",letterSpacing:"0.08em"}}>💡 Styling Tip</p>
-                <p style={{color:C.textSub,margin:0,fontSize:"13px",lineHeight:"1.75"}}>{result.styling_tip}</p>
-              </div>
-              <p style={{color:C.accent,fontStyle:"italic",margin:0,fontSize:"14px",lineHeight:"1.7"}}>{result.confidence_boost}</p>
             </div>
-          )}
-          {!loading&&!result&&!error&&(
-            <div style={{background:C.surfaceDark,borderRadius:"16px",padding:"60px 32px",textAlign:"center",border:`1px dashed ${C.border}`}}>
-              <div style={{fontSize:"40px",marginBottom:"18px",opacity:0.5}}>✦</div>
-              <h3 style={{color:C.text,margin:"0 0 10px",fontWeight:"400",fontStyle:"italic"}}>Your Style Awaits</h3>
-              <p style={{color:C.textSub,fontSize:"13px",lineHeight:"1.8",margin:0}}>Complete your profile on the left and our AI will craft personalized batik recommendations just for you.</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-function DesignPage() {
-  const [form,setForm]=useState({motif:"",colors:"",mood:"",use:""});
-  const [loading,setLoading]=useState(false);
-  const [result,setResult]=useState(null);
-  const [error,setError]=useState(null);
-  const opts={
-    motif:["Parang (Diagonal Waves)","Kawung (Sacred Circles)","Mega Mendung (Clouds)","Truntum (Star Flowers)","Sidomukti (Royal Court)","Lereng (Diagonal Stripes)","Abstract Fusion"],
-    colors:["Earth Tones (Brown, Terracotta)","Ocean Blues (Navy, Teal)","Forest Greens","Sunset Oranges & Gold","Monochrome (Black & White)","Pastels (Soft & Modern)","Jewel Tones (Rich & Bold)"],
-    mood:["Modern & Minimal","Bold & Expressive","Traditional & Sacred","Playful & Youthful","Elegant & Refined"],
-    use:["Office Wear","Formal Events","Cultural Ceremonies","Casual Fashion","Social Media Content"],
-  };
-  const ready=Object.values(form).every(v=>v);
-  const svgColors=COLOR_MAP[form.colors]||["#8B4513","#D2691E"];
-
-  const handleGenerate=async()=>{
-    if(!ready)return;
-    setLoading(true); setError(null); setResult(null);
-    try {
-      const r=await callClaude(`You are a batik design expert for Batik Yedijah, a modern Indonesian batik brand. Create a batik design concept for: motif: ${form.motif}, colors: ${form.colors}, mood: ${form.mood}, use: ${form.use}.
-
-Return ONLY a JSON object (no markdown, no preamble):
-{"design_name":"creative name (2-4 words)","tagline":"short evocative tagline max 8 words","description":"2-3 sentences on what makes this design special","motif_story":"1-2 sentences on traditional meaning/cultural origin","modern_twist":"1-2 sentences on the contemporary reinterpretation","color_story":"1-2 sentences describing palette and its emotional effect","best_worn_for":"1 specific scenario sentence","care_tip":"one practical fabric care tip","price_range":"Rp 155.000 – 245.000"}`);
-      setResult(r);
-    } catch(e) { setError("Generation failed. Please try again."); }
-    setLoading(false);
-  };
-
-  return (
-    <Section>
-      <SectionHead title="AI Design Studio" sub="Generate unique batik design concepts — traditional motifs reinterpreted for modern fashion."/>
-      <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) minmax(0,1fr)",gap:"40px",alignItems:"start"}}>
-        <div style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:"16px",padding:"28px 32px"}}>
-          <p style={{color:C.textMuted,fontSize:"12px",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",margin:"0 0 22px"}}>Design Parameters</p>
-          <SelectGroup label="Base Motif" field="motif" opts={opts.motif} form={form} setForm={setForm}/>
-          <SelectGroup label="Color Palette" field="colors" opts={opts.colors} form={form} setForm={setForm}/>
-          <SelectGroup label="Design Mood" field="mood" opts={opts.mood} form={form} setForm={setForm}/>
-          <SelectGroup label="Intended Use" field="use" opts={opts.use} form={form} setForm={setForm}/>
-          <Btn onClick={handleGenerate} disabled={!ready||loading} sx={{width:"100%",padding:"13px",fontSize:"13px",marginTop:"8px",boxSizing:"border-box"}}>
-            {loading?"Generating…":"Generate Design Concept ✦"}
-          </Btn>
-        </div>
-        <div>
-          <div style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:"16px",padding:"24px",marginBottom:"20px",textAlign:"center"}}>
-            <p style={{color:C.textMuted,fontSize:"11px",margin:"0 0 14px",textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:"700"}}>Live Pattern Preview</p>
-            <div style={{display:"inline-block",padding:"16px",background:C.surfaceDark,borderRadius:"12px"}}>
-              <BatikSwatch motif={MOTIF_KEY[form.motif]||"kawung"} c1={svgColors[0]} c2={svgColors[1]} size={210}/>
-            </div>
-            <p style={{color:C.textMuted,fontSize:"11px",margin:"12px 0 0",fontStyle:"italic"}}>Generative preview · Actual print may vary</p>
           </div>
-          {loading && <Loader text="Designing your batik concept…"/>}
-          {error && <ErrorBox msg={error}/>}
-          {result && (
-            <div style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:"16px",padding:"28px 32px"}}>
-              <div style={{borderBottom:`1px solid ${C.border}`,paddingBottom:"16px",marginBottom:"20px"}}>
-                <h3 style={{color:C.text,margin:"0 0 4px",fontSize:"22px",fontStyle:"italic",fontWeight:"400"}}>{result.design_name}</h3>
-                <p style={{color:C.accent,margin:0,fontSize:"13px",fontWeight:"600",letterSpacing:"0.04em"}}>{result.tagline}</p>
-              </div>
-              <p style={{color:C.textSub,lineHeight:"1.85",margin:"0 0 20px",fontSize:"13px"}}>{result.description}</p>
-              {[
-                ["Traditional Origin",result.motif_story],
-                ["Modern Reinterpretation",result.modern_twist],
-                ["Color Story",result.color_story],
-                ["Best Worn For",result.best_worn_for],
-                ["Care",result.care_tip],
-              ].map(([lbl,val])=>(
-                <div key={lbl} style={{marginBottom:"12px",paddingLeft:"12px",borderLeft:`2px solid ${C.border}`}}>
-                  <p style={{color:C.text,margin:"0 0 3px",fontSize:"11px",fontWeight:"700",textTransform:"uppercase",letterSpacing:"0.09em"}}>{lbl}</p>
-                  <p style={{color:C.textSub,margin:0,fontSize:"12px",lineHeight:"1.7"}}>{val}</p>
-                </div>
-              ))}
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:"20px",paddingTop:"16px",borderTop:`1px solid ${C.border}`}}>
-                <span style={{color:C.accent,fontWeight:"700",fontSize:"18px"}}>{result.price_range}</span>
-                <Btn sx={{padding:"8px 18px",fontSize:"12px"}}>Order This Design</Btn>
-              </div>
+        )}
+
+        {/* ════ AI STYLIST ══════════════════════════════════════ */}
+        {page === 'stylist' && (
+          <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '48px 32px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <p style={{ color: TC, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '8px' }}>Powered by Claude AI</p>
+              <h1 style={{ fontSize: '34px', fontWeight: '300', fontStyle: 'italic', color: BN, margin: '0 0 12px' }}>AI Personal Stylist</h1>
+              <p style={{ color: TXL, fontSize: '14px', maxWidth: '480px', margin: '0 auto' }}>
+                Share your profile and get AI-powered batik recommendations tailored to your body, skin tone, and occasion.
+              </p>
             </div>
-          )}
-        </div>
-      </div>
-    </Section>
-  );
-}
 
-function TryOnPage() {
-  const [uploaded,setUploaded]=useState(false);
-  const [selected,setSelected]=useState(null);
-  const fileRef=useRef();
-  const sel=PRODUCTS.find(p=>p.id===selected);
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: sResult ? '1fr 1fr' : 'minmax(0, 600px)',
+              justifyContent: 'center',
+              gap: '32px', alignItems: 'start',
+            }}>
+              {/* Profile form */}
+              <div style={{ ...cardSt, padding: '32px' }}>
+                <p style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: TC, marginBottom: '24px', fontWeight: '600' }}>YOUR PROFILE</p>
+                {[
+                  { label: 'BODY TYPE',       val: sBody,  set: setSBody,  opts: ['Slim / Petite', 'Athletic / Fit', 'Curvy / Hourglass', 'Plus Size / Full Figure', 'Tall / Lean'] },
+                  { label: 'SKIN TONE',        val: sSkin,  set: setSSkin,  opts: ['Very Fair', 'Fair / Light', 'Medium / Olive', 'Tan / Brown', 'Deep / Dark'] },
+                  { label: 'OCCASION',         val: sOcc,   set: setSOcc,   opts: ['Office / Work', 'Formal Event', 'Cultural Ceremony', 'Casual Daily Wear', 'Social Media Content'] },
+                  { label: 'STYLE PREFERENCE', val: sStyle, set: setSStyle, opts: ['Bold & Expressive', 'Minimalist & Clean', 'Traditional & Elegant', 'Streetwear Fusion', 'Feminine & Flowy'] },
+                ].map(({ label, val, set, opts }) => (
+                  <div key={label} style={{ marginBottom: '24px' }}>
+                    <p style={{ fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: '600', color: TX, marginBottom: '10px' }}>{label}</p>
+                    <div>{opts.map(o => <button key={o} onClick={() => set(o)} style={chipSt(val === o)}>{o}</button>)}</div>
+                  </div>
+                ))}
+                <button
+                  onClick={handleStylistSubmit}
+                  disabled={!sBody || !sSkin || !sOcc || sLoading}
+                  style={{ ...btnSt(true), width: '100%', marginTop: '8px', opacity: (!sBody || !sSkin || !sOcc) ? 0.5 : 1 }}
+                >
+                  {sLoading ? 'Getting Your Style...' : 'Get My Style Recommendations'}
+                </button>
+              </div>
 
-  return (
-    <Section>
-      <SectionHead title="Virtual Try-On" sub="See exactly how batik looks on your body before buying. No more purchase anxiety."/>
-      <div style={{maxWidth:"900px",margin:"0 auto"}}>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"36px"}}>
-          <div>
-            <p style={{color:C.textMuted,fontSize:"11px",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",margin:"0 0 16px"}}>Step 1 — Upload Your Photo</p>
-            <div onClick={()=>fileRef.current?.click()}
-              style={{border:`2px dashed ${uploaded?C.accent:C.border}`,borderRadius:"14px",padding:"44px 20px",textAlign:"center",cursor:"pointer",background:uploaded?`${C.accent}08`:C.bg,transition:"all 0.22s"}}>
-              <input ref={fileRef} type="file" accept="image/*" style={{display:"none"}} onChange={()=>setUploaded(true)}/>
-              {uploaded ? (
-                <><div style={{fontSize:"36px",marginBottom:"10px"}}>✓</div><p style={{color:C.accent,fontWeight:"700",margin:"0 0 4px",fontSize:"15px"}}>Photo uploaded!</p><p style={{color:C.textSub,fontSize:"12px",margin:0}}>Click to replace</p></>
-              ) : (
-                <><div style={{fontSize:"36px",marginBottom:"10px",opacity:0.5}}>📷</div><p style={{color:C.text,fontWeight:"600",margin:"0 0 6px",fontSize:"14px"}}>Upload a photo</p><p style={{color:C.textSub,fontSize:"12px",margin:0,lineHeight:"1.6"}}>Front-facing photos work best.<br/>Your image stays private.</p></>
+              {/* Results panel */}
+              {sResult && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {sResult.error ? (
+                    <div style={{ ...cardSt, padding: '32px', textAlign: 'center' }}>
+                      <p style={{ color: '#C00' }}>Something went wrong. Please try again.</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Tagline */}
+                      <div style={{ ...cardSt, padding: '24px', borderLeft: `4px solid ${TC}` }}>
+                        <p style={{ fontStyle: 'italic', fontSize: '17px', color: BN, lineHeight: '1.6', margin: 0 }}>{sResult.tagline}</p>
+                      </div>
+
+                      {/* Style rec + color palette */}
+                      {[
+                        { label: 'STYLE RECOMMENDATION', val: sResult.styleRec },
+                        { label: 'YOUR COLOR PALETTE',    val: sResult.colorPalette },
+                      ].map(({ label, val }) => (
+                        <div key={label} style={{ ...cardSt, padding: '20px' }}>
+                          <p style={{ fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase', color: TC, fontWeight: '600', marginBottom: '10px' }}>{label}</p>
+                          <p style={{ color: TX, lineHeight: '1.7', margin: 0, fontSize: '14px' }}>{val}</p>
+                        </div>
+                      ))}
+
+                      {/* Top picks with product images */}
+                      <div style={{ ...cardSt, padding: '20px' }}>
+                        <p style={{ fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase', color: TC, fontWeight: '600', marginBottom: '14px' }}>TOP PICKS FOR YOU</p>
+                        {sResult.topPicks?.map((pick, i) => {
+                          const firstWord = pick.name.toLowerCase().split(' ')[0]
+                          const matched = PRODUCTS.find(p => p.name.toLowerCase().includes(firstWord))
+                          const disp = matched || recProds[i] || PRODUCTS[i]
+                          return (
+                            <div key={i} style={{ display: 'flex', gap: '12px', marginBottom: '14px', padding: '12px', background: CR, borderRadius: '8px' }}>
+                              {disp && (
+                                <img src={disp.img} alt={disp.name}
+                                  style={{ width: '68px', height: '68px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }}
+                                />
+                              )}
+                              <div>
+                                <p style={{ fontSize: '14px', fontWeight: '600', color: BN, margin: '0 0 4px' }}>{pick.name}</p>
+                                <p style={{ fontSize: '12px', color: TXL, margin: 0, lineHeight: '1.5' }}>{pick.why}</p>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+
+                      {/* Styling tip */}
+                      <div style={{ ...cardSt, padding: '20px', background: `${TC}0D` }}>
+                        <p style={{ fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase', color: TC, fontWeight: '600', marginBottom: '10px' }}>STYLING TIP</p>
+                        <p style={{ color: TX, lineHeight: '1.7', margin: 0, fontSize: '14px' }}>{sResult.stylingTip}</p>
+                      </div>
+
+                      {/* Occasion-matched product photos */}
+                      {recProds.length > 0 && (
+                        <div style={{ ...cardSt, padding: '20px' }}>
+                          <p style={{ fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase', color: TC, fontWeight: '600', marginBottom: '14px' }}>
+                            PERFECT FOR {sOcc.toUpperCase()}
+                          </p>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                            {recProds.slice(0, 4).map(p => (
+                              <div key={p.id} onClick={() => goTo('collection')} style={{ cursor: 'pointer' }}>
+                                <img src={p.img} alt={p.name}
+                                  style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: '8px' }}
+                                  onMouseOver={e => { e.currentTarget.style.opacity = '0.8' }}
+                                  onMouseOut={e => { e.currentTarget.style.opacity = '1' }}
+                                />
+                                <p style={{ fontSize: '10px', color: TXL, textAlign: 'center', margin: '4px 0 0' }}>{p.name}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <button onClick={() => { setTProd(null); setTStep(1); goTo('tryon') }} style={btnSt(true)}>
+                        Try On My Picks →
+                      </button>
+                    </>
+                  )}
+                </div>
               )}
             </div>
-            <p style={{color:C.textMuted,fontSize:"11px",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",margin:"24px 0 14px"}}>Step 2 — Choose a Garment</p>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px"}}>
-              {PRODUCTS.slice(0,4).map(p=>(
-                <div key={p.id} onClick={()=>setSelected(p.id)}
-                  style={{border:`2px solid ${selected===p.id?C.accent:C.border}`,borderRadius:"10px",padding:"12px",cursor:"pointer",background:selected===p.id?`${C.accent}0A`:C.white,transition:"all 0.18s"}}>
-                  <BatikSwatch motif={p.motif} c1={p.c1} c2={p.c2} size={64}/>
-                  <p style={{color:selected===p.id?C.accent:C.text,margin:"8px 0 0",fontSize:"11px",fontWeight:"600",lineHeight:"1.3"}}>{p.name}</p>
-                  <p style={{color:C.textMuted,margin:"2px 0 0",fontSize:"10px"}}>{p.price}</p>
+          </div>
+        )}
+
+        {/* ════ DESIGN STUDIO ═══════════════════════════════════ */}
+        {page === 'studio' && (
+          <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '48px 32px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <p style={{ color: TC, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '8px' }}>Powered by Claude AI</p>
+              <h1 style={{ fontSize: '34px', fontWeight: '300', fontStyle: 'italic', color: BN, margin: '0 0 12px' }}>AI Design Studio</h1>
+              <p style={{ color: TXL, fontSize: '14px', maxWidth: '480px', margin: '0 auto' }}>
+                Co-create a custom batik design concept. Describe your vision and let AI bring it to life.
+              </p>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: dResult ? '1fr 1fr' : 'minmax(0, 600px)',
+              justifyContent: 'center',
+              gap: '32px', alignItems: 'start',
+            }}>
+              <div style={{ ...cardSt, padding: '32px' }}>
+                <p style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: TC, marginBottom: '24px', fontWeight: '600' }}>YOUR DESIGN BRIEF</p>
+                {[
+                  { label: 'MOTIF THEME',   val: dMotif,   set: setDMotif,   opts: ['Floral & Botanical', 'Birds & Nature', 'Geometric & Abstract', 'Celestial & Cosmic', 'Traditional Parang', 'Faith & Spiritual'] },
+                  { label: 'COLOR PALETTE', val: dPalette, set: setDPalette, opts: ['Earthy Neutrals', 'Vibrant Jewel Tones', 'Soft Pastels', 'Monochromatic', 'Bold Contrast', 'Warm Sunset'] },
+                  { label: 'MOOD',          val: dMood,    set: setDMood,    opts: ['Serene & Calming', 'Bold & Expressive', 'Mystical & Spiritual', 'Playful & Joyful', 'Elegant & Refined'] },
+                  { label: 'INTENDED USE',  val: dUse,     set: setDUse,     opts: ['Everyday Wear', 'Formal Events', 'Cultural Ceremonies', 'Content Creation', 'Gift / Special Occasion'] },
+                ].map(({ label, val, set, opts }) => (
+                  <div key={label} style={{ marginBottom: '24px' }}>
+                    <p style={{ fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: '600', color: TX, marginBottom: '10px' }}>{label}</p>
+                    <div>{opts.map(o => <button key={o} onClick={() => set(o)} style={chipSt(val === o)}>{o}</button>)}</div>
+                  </div>
+                ))}
+                <button
+                  onClick={handleDesignSubmit}
+                  disabled={!dMotif || !dPalette || dLoading}
+                  style={{ ...btnSt(true), width: '100%', marginTop: '8px', opacity: (!dMotif || !dPalette) ? 0.5 : 1 }}
+                >
+                  {dLoading ? 'Creating Your Design...' : 'Generate Design Concept'}
+                </button>
+              </div>
+
+              {dResult && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {dResult.error ? (
+                    <div style={{ ...cardSt, padding: '32px', textAlign: 'center' }}>
+                      <p style={{ color: '#C00' }}>Something went wrong. Please try again.</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ ...cardSt, padding: '24px', borderLeft: `4px solid ${TC}` }}>
+                        <p style={{ fontSize: '20px', fontWeight: '700', color: BN, margin: '0 0 8px' }}>{dResult.name}</p>
+                        <p style={{ fontSize: '14px', color: TXL, lineHeight: '1.7', margin: 0 }}>{dResult.concept}</p>
+                      </div>
+                      {[
+                        { label: 'PATTERN DESCRIPTION', val: dResult.pattern },
+                        { label: 'COLOR STORY',          val: dResult.colorStory },
+                        { label: 'MOTIF SYMBOLISM',      val: dResult.symbolism },
+                        { label: 'RECOMMENDED GARMENT',  val: dResult.garment },
+                        { label: 'PRODUCTION TECHNIQUE', val: dResult.production },
+                      ].map(({ label, val }) => (
+                        <div key={label} style={{ ...cardSt, padding: '20px' }}>
+                          <p style={{ fontSize: '10px', letterSpacing: '2px', textTransform: 'uppercase', color: TC, fontWeight: '600', marginBottom: '8px' }}>{label}</p>
+                          <p style={{ color: TX, lineHeight: '1.7', margin: 0, fontSize: '14px' }}>{val}</p>
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => { setDMotif(''); setDPalette(''); setDMood(''); setDUse(''); setDResult(null) }}
+                        style={btnSt(false)}
+                      >
+                        Design Another
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ════ VIRTUAL TRY-ON ══════════════════════════════════ */}
+        {page === 'tryon' && (
+          <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '48px 32px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+              <p style={{ color: TC, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '8px' }}>Powered by Claude AI Vision</p>
+              <h1 style={{ fontSize: '34px', fontWeight: '300', fontStyle: 'italic', color: BN, margin: '0 0 12px' }}>Virtual Try-On</h1>
+              <p style={{ color: TXL, fontSize: '14px', maxWidth: '520px', margin: '0 auto' }}>
+                Select a piece, optionally upload your photo, and get a personalized AI styling consultation.
+              </p>
+            </div>
+
+            {/* Step indicators */}
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '40px' }}>
+              {['Select Piece', 'Your Photo', 'Results'].map((label, i) => (
+                <div key={label} style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                    <div style={{
+                      width: '32px', height: '32px', borderRadius: '50%',
+                      background: tStep >= i + 1 ? TC : BD,
+                      color: tStep >= i + 1 ? WH : TXL,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '13px', fontWeight: '600',
+                    }}>{i + 1}</div>
+                    <span style={{ fontSize: '11px', color: tStep === i + 1 ? TC : TXL, whiteSpace: 'nowrap' }}>{label}</span>
+                  </div>
+                  {i < 2 && (
+                    <div style={{ width: '60px', height: '1px', background: BD, margin: '0 8px', marginBottom: '20px' }} />
+                  )}
                 </div>
               ))}
             </div>
-          </div>
-          <div>
-            <p style={{color:C.textMuted,fontSize:"11px",fontWeight:"700",letterSpacing:"0.1em",textTransform:"uppercase",margin:"0 0 16px"}}>Step 3 — See the Result</p>
-            <div style={{background:C.surfaceDark,borderRadius:"14px",minHeight:"340px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 20px",border:`1px solid ${C.border}`}}>
-              {uploaded&&selected ? (
-                <>
-                  <div style={{width:"130px",height:"190px",background:C.white,borderRadius:"10px",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:"16px",border:`1px solid ${C.border}`,overflow:"hidden"}}>
-                    <BatikSwatch motif={sel?.motif||"kawung"} c1={sel?.c1||"#8B1A1A"} c2={sel?.c2||"#D4A017"} size={130}/>
+
+            {/* Step 1: Product selection */}
+            {tStep === 1 && (
+              <div>
+                <p style={{ textAlign: 'center', color: TXL, marginBottom: '24px', fontSize: '14px' }}>
+                  Choose a Batik Yedijah piece to try on:
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+                  {PRODUCTS.map(p => (
+                    <div key={p.id} onClick={() => setTProd(p.id)} style={{
+                      ...cardSt,
+                      cursor: 'pointer',
+                      border: `2px solid ${tProd === p.id ? TC : BD}`,
+                      transform: tProd === p.id ? 'scale(1.02)' : 'scale(1)',
+                      transition: 'all 0.2s',
+                    }}>
+                      <div style={{ height: '190px', overflow: 'hidden' }}>
+                        <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                      <div style={{ padding: '10px', textAlign: 'center' }}>
+                        <p style={{ fontSize: '12px', fontWeight: '600', color: TX, margin: '0 0 2px' }}>{p.name}</p>
+                        <p style={{ fontSize: '11px', color: TC, margin: 0 }}>{p.price}</p>
+                      </div>
+                      {tProd === p.id && (
+                        <div style={{ background: TC, color: WH, textAlign: 'center', padding: '6px', fontSize: '11px', fontWeight: '600' }}>
+                          ✓ Selected
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <button
+                    onClick={() => tProd && setTStep(2)}
+                    disabled={!tProd}
+                    style={{ ...btnSt(true), opacity: tProd ? 1 : 0.5 }}
+                  >
+                    Next: Add Your Photo →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Photo upload */}
+            {tStep === 2 && (
+              <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+                {selectedProd && (
+                  <div style={{ ...cardSt, padding: '16px', display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '28px' }}>
+                    <img src={selectedProd.img} alt={selectedProd.name}
+                      style={{ width: '72px', height: '72px', objectFit: 'cover', borderRadius: '8px' }}
+                    />
+                    <div>
+                      <p style={{ fontSize: '10px', color: TC, textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 4px' }}>Selected Piece</p>
+                      <p style={{ fontSize: '16px', fontWeight: '600', color: BN, margin: '0 0 2px' }}>{selectedProd.name}</p>
+                      <p style={{ fontSize: '13px', color: TXL, margin: 0 }}>{selectedProd.price}</p>
+                    </div>
                   </div>
-                  <p style={{color:C.text,fontWeight:"600",margin:"0 0 4px",fontSize:"14px"}}>{sel?.name}</p>
-                  <p style={{color:C.accent,fontWeight:"700",margin:"0 0 14px",fontSize:"13px"}}>{sel?.price}</p>
-                  <div style={{background:"#F0FDF4",border:"1px solid #86EFAC",borderRadius:"8px",padding:"12px 18px",textAlign:"center"}}>
-                    <p style={{color:"#15803D",margin:"0 0 2px",fontSize:"12px",fontWeight:"700"}}>✓ Try-On Rendered</p>
-                    <p style={{color:"#16A34A",margin:0,fontSize:"11px"}}>Powered by Revery.ai SDK</p>
+                )}
+
+                <div style={{ ...cardSt, padding: '32px', textAlign: 'center' }}>
+                  <div
+                    style={{
+                      border: `2px dashed ${BD}`, borderRadius: '12px', padding: '40px 24px',
+                      marginBottom: '20px', cursor: 'pointer',
+                      background: tPhotoUrl ? 'transparent' : `${CR}80`,
+                    }}
+                    onClick={() => fileRef.current && fileRef.current.click()}
+                  >
+                    {tPhotoUrl ? (
+                      <div>
+                        <img src={tPhotoUrl} alt="Your photo"
+                          style={{ maxHeight: '280px', maxWidth: '100%', borderRadius: '8px', marginBottom: '12px' }}
+                        />
+                        <p style={{ color: TC, fontSize: '12px', margin: 0 }}>Click to change photo</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <div style={{ fontSize: '36px', marginBottom: '12px' }}>📸</div>
+                        <p style={{ fontSize: '16px', fontWeight: '600', color: BN, margin: '0 0 8px' }}>Upload Your Photo</p>
+                        <p style={{ fontSize: '13px', color: TXL, margin: 0 }}>
+                          Optional — for a personalized try-on based on your photo
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  <Btn sx={{marginTop:"16px",padding:"9px 22px",fontSize:"12px"}}>Add to Bag</Btn>
-                </>
-              ) : (
-                <>
-                  <div style={{fontSize:"48px",marginBottom:"18px",opacity:0.3}}>👗</div>
-                  <p style={{color:C.textSub,fontSize:"13px",lineHeight:"1.8",margin:0,textAlign:"center",maxWidth:"220px"}}>
-                    {!uploaded&&!selected?"Upload a photo and select a garment to see your try-on preview.":!uploaded?"Upload your photo first to continue.":"Now select a garment to try on."}
+
+                  <input ref={fileRef} type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
+
+                  <p style={{ fontSize: '11px', color: TXL, marginBottom: '20px' }}>
+                    Your photo is only sent to Claude AI for styling analysis. It is not stored anywhere.
                   </p>
-                </>
-              )}
-            </div>
-            <div style={{marginTop:"16px",padding:"14px 18px",background:`${C.gold}14`,borderRadius:"10px",border:`1px solid ${C.gold}40`}}>
-              <p style={{color:C.text,fontSize:"11px",fontWeight:"700",margin:"0 0 3px",textTransform:"uppercase",letterSpacing:"0.08em"}}>🔒 Privacy First</p>
-              <p style={{color:C.textSub,fontSize:"11px",margin:0,lineHeight:"1.6"}}>Photos are processed securely in your browser session and are never stored on our servers.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Section>
-  );
-}
 
-function AboutPage() {
-  return (
-    <div>
-      <div style={{background:"linear-gradient(135deg,#2C1A0E,#5C2D0A)",padding:"90px 24px",textAlign:"center",position:"relative",overflow:"hidden"}}>
-        <div style={{position:"absolute",inset:0,opacity:0.06}}>
-          <svg width="100%" height="100%"><defs><pattern id="ap" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M25 5 L35 20 L48 20 L38 30 L42 45 L25 36 L8 45 L12 30 L2 20 L15 20Z" fill="none" stroke="#FDF6EC" strokeWidth="1.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#ap)"/></svg>
-        </div>
-        <div style={{position:"relative"}}>
-          <Badge color="#B8870B">Est. 2010 · Bekasi, West Java</Badge>
-          <h1 style={{color:"#FDF6EC",fontSize:"clamp(34px,5vw,60px)",margin:"20px 0 16px",fontWeight:"300",fontStyle:"italic"}}>Our Story</h1>
-          <p style={{color:"#C8A480",fontSize:"17px",maxWidth:"560px",margin:"0 auto",lineHeight:"1.9",fontWeight:"300"}}>15 years of batik craftsmanship, now reimagined for the modern generation by a second-generation founder.</p>
-        </div>
-      </div>
-      <Section>
-        <div style={{display:"grid",gridTemplateColumns:"minmax(0,1.2fr) minmax(0,0.8fr)",gap:"64px",alignItems:"center"}}>
-          <div>
-            <h2 style={{color:C.text,fontSize:"34px",margin:"0 0 20px",fontStyle:"italic",fontWeight:"300",lineHeight:"1.25"}}>A Family Heritage Modernised</h2>
-            <p style={{color:C.textSub,lineHeight:"1.9",marginBottom:"16px",fontSize:"15px"}}>Batik Yedijah was founded in Bekasi, West Java — a city at the heart of Indonesia's textile culture. The name Yedijah carries personal meaning: every design is created with a specific value or life philosophy woven into the motif.</p>
-            <p style={{color:C.textSub,lineHeight:"1.9",marginBottom:"16px",fontSize:"15px"}}>What began as a family craft business has been taken forward by second-generation owner Jessica Hasan — a Fashion Design Merchandising graduate of Shih Chien University, Taipei, and current NTU GMBA candidate.</p>
-            <p style={{color:C.textSub,lineHeight:"1.9",fontSize:"15px"}}>Jessica brings formal design education and graduate-level business strategy to a business built on 15 years of supplier relationships, production expertise, and authentic Indonesian heritage — now scaling into a fashion-tech brand powered by AI.</p>
-            <div style={{marginTop:"28px",padding:"20px 24px",background:C.surfaceDark,borderRadius:"12px",borderLeft:`3px solid ${C.accent}`}}>
-              <p style={{color:C.text,margin:"0 0 4px",fontSize:"14px",fontStyle:"italic",lineHeight:"1.7"}}>"Batik khas Bekasi — didesign dengan sebuah makna dan nilai nilai kehidupan dalam setiap motifnya."</p>
-              <p style={{color:C.textMuted,margin:0,fontSize:"12px"}}>Bekasi's signature batik — designed with meaning and life values in every motif.</p>
-            </div>
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"14px"}}>
-            {[["15+","Years of Heritage"],["4,000+","Instagram Followers"],["400+","Units/Month"],["Rp 300M","Cash On Hand"],["500–800","Ready Garments"],["30+","Fabric Rolls"]].map(([n,l])=>(
-              <div key={l} style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:"12px",padding:"20px 16px",textAlign:"center"}}>
-                <p style={{color:C.accent,fontSize:"22px",fontWeight:"700",margin:"0 0 4px",fontStyle:"italic"}}>{n}</p>
-                <p style={{color:C.textSub,fontSize:"11px",margin:0,lineHeight:"1.4"}}>{l}</p>
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                    <button onClick={() => setTStep(1)} style={btnSt(false)}>← Back</button>
+                    <button onClick={handleTryOn} disabled={tLoading} style={btnSt(true)}>
+                      {tLoading ? 'Analyzing...' : tPhotoUrl ? 'Analyze My Look ✨' : 'Skip — Get Style Guide →'}
+                    </button>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </Section>
-      <Section bg={C.surfaceDark}>
-        <SectionHead title="The AI Advantage" sub="No other batik brand is integrating AI at this level. This is what makes Batik Yedijah different."/>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:"20px"}}>
-          {[
-            {phase:"Priority 1",title:"AI Personal Stylist",desc:"Customers input body type, skin tone, and occasion. AI recommends designs, colors, and outfit combinations. Removes the #1 purchase barrier.",status:"Live Now"},
-            {phase:"Priority 2",title:"AI Virtual Try-On",desc:"Upload a photo and see the garment on your body before purchasing. Solves the biggest online fashion pain point.",status:"Beta"},
-            {phase:"Priority 3",title:"AI Design Generator",desc:"Generate new batik patterns blending traditional motifs with contemporary aesthetics. Live on this platform.",status:"Live Now"},
-            {phase:"Priority 4",title:"AI Trend Predictor",desc:"Analyzes fashion trends and customer behavior to predict which designs will sell. Reduces unsold inventory.",status:"Year 3"},
-          ].map(f=>(
-            <div key={f.title} style={{background:C.white,border:`1px solid ${C.border}`,borderRadius:"14px",padding:"24px"}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"12px"}}>
-                <Tag>{f.phase}</Tag>
-                <span style={{fontSize:"10px",fontWeight:"700",padding:"3px 9px",borderRadius:"20px",letterSpacing:"0.08em",textTransform:"uppercase",background:f.status==="Live Now"?"#F0FDF4":f.status==="Beta"?"#FFF7ED":"#F5F3FF",color:f.status==="Live Now"?"#15803D":f.status==="Beta"?"#C2410C":"#6D28D9"}}>{f.status}</span>
+            )}
+
+            {/* Step 3: Results */}
+            {tStep === 3 && (
+              <div>
+                {tLoading ? (
+                  <div style={{ textAlign: 'center', padding: '80px 24px' }}>
+                    <div style={{ fontSize: '36px', marginBottom: '16px' }}>✨</div>
+                    <p style={{ fontSize: '18px', color: BN, marginBottom: '8px' }}>Your AI stylist is analyzing...</p>
+                    <p style={{ color: TXL, fontSize: '14px' }}>This takes just a few seconds.</p>
+                  </div>
+                ) : (
+                  <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: tPhotoUrl ? '1fr 1fr 2fr' : '1fr 3fr',
+                      gap: '24px', marginBottom: '28px', alignItems: 'start',
+                    }}>
+                      {selectedProd && (
+                        <div style={{ textAlign: 'center' }}>
+                          <p style={{ fontSize: '10px', color: TC, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Selected Piece</p>
+                          <img src={selectedProd.img} alt={selectedProd.name}
+                            style={{ width: '100%', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}
+                          />
+                          <p style={{ fontSize: '13px', fontWeight: '600', color: BN, marginTop: '8px', marginBottom: '2px' }}>{selectedProd.name}</p>
+                          <p style={{ fontSize: '12px', color: TC, margin: 0 }}>{selectedProd.price}</p>
+                        </div>
+                      )}
+                      {tPhotoUrl && (
+                        <div style={{ textAlign: 'center' }}>
+                          <p style={{ fontSize: '10px', color: TC, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Your Photo</p>
+                          <img src={tPhotoUrl} alt="You"
+                            style={{ width: '100%', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', maxHeight: '360px', objectFit: 'cover' }}
+                          />
+                        </div>
+                      )}
+                      <div style={{ ...cardSt, padding: '28px' }}>
+                        <p style={{ fontSize: '10px', color: TC, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: '600', marginBottom: '16px' }}>
+                          {tPhotoUrl ? 'YOUR PERSONALIZED TRY-ON' : 'STYLE GUIDE'}
+                        </p>
+                        <div style={{ fontSize: '14px', color: TX, lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
+                          {tResult}
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                      <button onClick={resetTryon} style={btnSt(false)}>Try Another Piece</button>
+                      <a href="https://wa.me/6287711553205" target="_blank" rel="noopener noreferrer" style={btnSt(true)}>
+                        Order via WhatsApp
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
-              <h3 style={{color:C.text,margin:"0 0 8px",fontSize:"16px",fontWeight:"600"}}>{f.title}</h3>
-              <p style={{color:C.textSub,fontSize:"13px",lineHeight:"1.7",margin:0}}>{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
-    </div>
-  );
-}
+            )}
+          </div>
+        )}
 
-function Footer({ setPage }) {
-  const links=[["products","Collection"],["stylist","AI Stylist"],["design","Design Studio"],["tryon","Virtual Try-On"],["about","Our Story"]];
-  return (
-    <footer style={{background:C.darkBg,color:"#9A7B6A",padding:"56px 24px 28px"}}>
-      <div style={{maxWidth:"1100px",margin:"0 auto"}}>
-        <div style={{display:"grid",gridTemplateColumns:"2fr 1fr 1fr",gap:"48px",marginBottom:"40px",flexWrap:"wrap"}}>
+        {/* ════ OUR STORY ═══════════════════════════════════════ */}
+        {page === 'story' && (
           <div>
-            <div style={{marginBottom:"16px"}}>
-              <span style={{fontSize:"20px",fontWeight:"700",color:"#FDF6EC",fontStyle:"italic"}}>Batik</span>
-              <span style={{fontSize:"20px",fontWeight:"300",color:"#FDF6EC",letterSpacing:"0.06em"}}> Yedijah</span>
+            <div style={{
+              background: `linear-gradient(135deg, ${BN} 0%, #7A3B1E 100%)`,
+              padding: '80px 32px', textAlign: 'center', color: WH,
+            }}>
+              <p style={{ color: `${CRD}70`, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '12px' }}>Our Heritage</p>
+              <h1 style={{ fontSize: '34px', fontWeight: '300', margin: '0 0 16px' }}>The Story of Batik Yedijah</h1>
+              <p style={{ maxWidth: '520px', margin: '0 auto', lineHeight: '1.8', color: `${WH}85`, fontSize: '14px' }}>
+                A family legacy woven in batik, now reimagined for the next generation.
+              </p>
             </div>
-            <p style={{fontSize:"13px",lineHeight:"1.85",color:"#7A5A4A",maxWidth:"260px",margin:"0 0 14px"}}>Modern batik for the modern generation. Powered by family heritage and AI innovation.</p>
-            <p style={{fontSize:"12px",color:"#5A3A2A",margin:0}}>@batikyedijah · Shopee · Tokopedia · Bekasi, Indonesia</p>
+
+            <div style={{ maxWidth: '780px', margin: '0 auto', padding: '64px 32px' }}>
+              {[
+                {
+                  title: 'Our Roots',
+                  body: "Batik Yedijah was born from a love of Indonesian textile heritage and a family legacy in batik craft. Founded in Bekasi, West Java, the brand carries forward generations of artisanal knowledge while embracing the aesthetic sensibilities of today's young professionals.",
+                },
+                {
+                  title: 'The Name',
+                  body: "Yedijah is a name that carries meaning — rooted in faith and purpose. It reflects the brand's belief that clothing is more than fabric: it is identity, story, and declaration. Each piece carries a spiritual intentionality that sets it apart from conventional fashion.",
+                },
+                {
+                  title: 'The Mission',
+                  body: "We exist to make batik accessible without diluting its depth. Through thoughtful modern design, accessible pricing, and AI-powered tools that personalize the experience, we bring Indonesia's living art form to wardrobes across the nation.",
+                },
+                {
+                  title: 'Innovation & Craft',
+                  body: 'Batik Yedijah bridges the handmade and the digital. Our AI Personal Stylist, Design Studio, and Vision-powered Virtual Try-On represent a commitment to innovating the batik experience while honoring the tradition that makes every piece meaningful.',
+                },
+              ].map((s, i) => (
+                <div key={i} style={{ marginBottom: '48px' }}>
+                  <div style={{ width: '36px', height: '3px', background: TC, marginBottom: '16px' }} />
+                  <h2 style={{ fontSize: '22px', fontWeight: '600', color: BN, marginBottom: '12px' }}>{s.title}</h2>
+                  <p style={{ fontSize: '15px', color: TX, lineHeight: '1.8', margin: 0 }}>{s.body}</p>
+                </div>
+              ))}
+
+              <div style={{ ...cardSt, padding: '32px', textAlign: 'center' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: '600', color: BN, marginBottom: '16px' }}>Get in Touch</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center', marginBottom: '20px' }}>
+                  <p style={{ fontSize: '14px', color: TXL, margin: 0 }}>📍 Bekasi, West Java, Indonesia</p>
+                  <a href="https://wa.me/6287711553205" style={{ color: TC, fontSize: '14px', textDecoration: 'none' }}>📱 +62 877-1155-3205</a>
+                  <a href="https://instagram.com/batikyedijah" target="_blank" rel="noopener noreferrer" style={{ color: TC, fontSize: '14px', textDecoration: 'none' }}>📷 @batikyedijah</a>
+                </div>
+                <a href="https://wa.me/6287711553205" target="_blank" rel="noopener noreferrer" style={btnSt(true)}>
+                  Order via WhatsApp
+                </a>
+              </div>
+            </div>
           </div>
-          <div>
-            <p style={{color:"#FDF6EC",fontSize:"11px",textTransform:"uppercase",letterSpacing:"0.12em",margin:"0 0 18px",fontWeight:"700"}}>Explore</p>
-            {links.map(([id,lbl])=>(
-              <button key={id} onClick={()=>setPage(id)} style={{display:"block",background:"none",border:"none",color:"#7A5A4A",cursor:"pointer",fontFamily:"inherit",fontSize:"13px",padding:"4px 0",textAlign:"left",transition:"color 0.15s"}}>{lbl}</button>
-            ))}
-          </div>
-          <div>
-            <p style={{color:"#FDF6EC",fontSize:"11px",textTransform:"uppercase",letterSpacing:"0.12em",margin:"0 0 18px",fontWeight:"700"}}>AI Features</p>
-            {["AI Personal Stylist","AI Design Studio","Virtual Try-On","AI Trend Predictor"].map(f=>(
-              <p key={f} style={{color:"#7A5A4A",fontSize:"13px",margin:"0 0 6px"}}>{f}</p>
-            ))}
-          </div>
-        </div>
-        <div style={{borderTop:"1px solid #2E1A0E",paddingTop:"20px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:"8px"}}>
-          <p style={{margin:0,fontSize:"11px",color:"#4A2A1A"}}>© 2026 Batik Yedijah · Jessica Hasan · @batikyedijah</p>
-          <p style={{margin:0,fontSize:"11px",color:"#4A2A1A"}}>AI-powered by Claude · Anthropic API</p>
-        </div>
+        )}
+
       </div>
-    </footer>
-  );
-}
-
-export default function App() {
-  const [page,setPage]=useState("home");
-  return (
-    <div style={{fontFamily:"'Georgia','Times New Roman',serif",background:C.bg,minHeight:"100vh"}}>
-      <NavBar page={page} setPage={setPage}/>
-      {page==="home"&&<HomePage setPage={setPage}/>}
-      {page==="products"&&<ProductsPage/>}
-      {page==="stylist"&&<StylistPage/>}
-      {page==="design"&&<DesignPage/>}
-      {page==="tryon"&&<TryOnPage/>}
-      {page==="about"&&<AboutPage/>}
-      <Footer setPage={setPage}/>
     </div>
-  );
+  )
 }
