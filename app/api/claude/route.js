@@ -8,16 +8,12 @@ export async function POST(req) {
 
     const apiKey = process.env.ANTHROPIC_API_KEY
     if (!apiKey) {
-      return Response.json({ error: 'Server configuration error' }, { status: 500 })
+      return Response.json({ error: 'API key not configured' }, { status: 500 })
     }
 
-    // If image is provided (base64), build a vision message; otherwise plain text
     const content = image
       ? [
-          {
-            type: 'image',
-            source: { type: 'base64', media_type: 'image/jpeg', data: image },
-          },
+          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: image } },
           { type: 'text', text: prompt },
         ]
       : prompt
@@ -30,13 +26,19 @@ export async function POST(req) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1500,
         messages: [{ role: 'user', content }],
       }),
     })
 
     const data = await response.json()
+
+    // Pass through Anthropic errors so we can see them
+    if (data.type === 'error') {
+      return Response.json({ error: data.error?.message || 'Anthropic API error' }, { status: 400 })
+    }
+
     return Response.json(data)
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 })
